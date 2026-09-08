@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ranking de Posts — UniCPO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root{
+    --navy:#0a2a52; --navy-2:#0d3a6b; --blue:#1f6fc4; --blue-soft:#4f9ae0;
+    --gold:#c9a24b; --gold-dark:#a97f28; --gold-soft:#e9d9a8;
+    --ink:#1a2230; --bg:#eef2f8; --card:#ffffff; --line:#e2e7f0; --muted:#69768c;
+    --grey:#9aa7b4;
+    --shadow:0 1px 2px rgba(16,40,80,.06), 0 8px 24px rgba(16,40,80,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Poppins,Inter,sans-serif;margin:0}
+  a{color:var(--blue)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  header.top{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;border-bottom:4px solid var(--gold)}
+  .top .wrap{padding:26px 20px 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand .mark{width:46px;height:46px;border-radius:12px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-family:Poppins;font-weight:800;font-size:20px;letter-spacing:.5px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  .brand h1{font-size:22px;letter-spacing:.2px}
+  .brand .sub{font-size:12.5px;color:#bcd0ea;font-weight:500;margin-top:2px}
+  .top .hint{font-size:12px;color:#a9c1de;max-width:340px;text-align:right}
+
+  .tabsbar{background:var(--navy-2);border-bottom:1px solid rgba(255,255,255,.08)}
+  .tabsbar .wrap{display:flex;align-items:center;gap:6px;padding:0 20px;overflow-x:auto}
+  .tab{appearance:none;border:0;background:transparent;color:#cdddef;font:inherit;font-weight:600;font-size:13.5px;padding:13px 16px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;position:relative}
+  .tab:hover{color:#fff}
+  .tab.active{color:#fff;border-bottom-color:var(--gold)}
+  .tab .del{margin-left:8px;opacity:.55;font-weight:700}
+  .tab .del:hover{opacity:1;color:var(--gold-soft)}
+  .tab.add{color:var(--gold-soft)}
+
+  main{padding:26px 0 60px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+  .pad{padding:20px}
+
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .kpi{padding:16px 18px}
+  .kpi .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
+  .kpi .val{font-family:Poppins;font-weight:800;font-size:26px;margin-top:4px;color:var(--navy)}
+  .kpi .val small{font-size:13px;color:var(--muted);font-weight:600}
+
+  .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  .pod{padding:18px;position:relative;overflow:hidden}
+  .pod::before{content:"";position:absolute;inset:0 auto 0 0;width:5px}
+  .pod.p1::before{background:var(--gold)}
+  .pod.p2::before{background:#9fb0c2}
+  .pod.p3::before{background:#c58b4d}
+  .pod .medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:Poppins;font-weight:800;color:#fff;font-size:15px}
+  .pod.p1 .medal{background:var(--gold)}
+  .pod.p2 .medal{background:#9fb0c2}
+  .pod.p3 .medal{background:#c58b4d}
+  .pod .name{font-weight:700;margin:10px 0 2px;font-size:14.5px;min-height:40px}
+  .pod .score{font-family:Poppins;font-weight:800;font-size:30px;color:var(--navy)}
+  .pod .score span{font-size:14px;color:var(--muted);font-weight:600}
+  .pod .mini{margin-top:10px}
+
+  .bar{height:9px;border-radius:6px;background:#eef1f6;overflow:hidden;display:flex}
+  .bar i{display:block;height:100%}
+  .seg1{background:var(--gold-dark)} .seg2{background:var(--gold)} .seg3{background:var(--blue)} .seg4{background:var(--blue-soft)} .seg5{background:var(--grey)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin:6px 2px 0}
+  .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar .grow{flex:1}
+  input[type=search],input.txt,select,textarea.txt{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  input[type=search]{width:min(320px,100%)}
+  .btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--navy);font:inherit;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+  .btn:hover{border-color:var(--blue);color:var(--blue)}
+  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.primary:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+  .btn.gold:hover{background:var(--gold-dark);border-color:var(--gold-dark);color:#fff}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tablewrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+  thead th{background:#f6f8fc;text-align:right;padding:11px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line)}
+  thead th:first-child,thead th:nth-child(2){text-align:left}
+  thead th.sorted{color:var(--navy)}
+  tbody td{padding:11px 12px;text-align:right;border-bottom:1px solid #eef1f6;white-space:nowrap}
+  tbody td:first-child,tbody td:nth-child(2){text-align:left}
+  tbody tr[data-v]{cursor:pointer}
+  tbody tr:hover{background:#fafbfe}
+  .rankcell{font-family:Poppins;font-weight:800;color:var(--navy);width:44px}
+  .rank1{color:var(--gold-dark)}
+  .vid{font-weight:600;max-width:340px;white-space:normal}
+  .scorecell{font-family:Poppins;font-weight:800;color:var(--navy);font-size:15px}
+  .detail td{background:#f7f9fd;font-size:12.5px;color:var(--muted)}
+  .detail .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;text-align:left}
+  .detail .grid div{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .detail .grid b{display:block;color:var(--ink);font-size:14px;font-family:Poppins}
+
+  .up{border:2px dashed var(--line);border-radius:14px;padding:34px;text-align:center;color:var(--muted);background:#fbfcfe}
+  .up h3{color:var(--navy);margin-bottom:6px}
+
+  .modal{position:fixed;inset:0;background:rgba(10,25,45,.5);display:none;place-items:center;padding:20px;z-index:50}
+  .modal.open{display:grid}
+  .modal .box{background:#fff;border-radius:16px;max-width:460px;width:100%;padding:22px}
+  .modal h3{color:var(--navy);margin-bottom:14px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .field select,.field input,.field textarea{width:100%}
+  .row2{display:grid;grid-template-columns:1fr 110px;gap:10px}
+  .msg{font-size:13px;margin-top:8px;padding:9px 11px;border-radius:9px;display:none}
+  .msg.ok{display:block;background:#e8f5ec;color:#1e6b3a}
+  .msg.err{display:block;background:#fdecec;color:#a52a2a}
+  .msg.info{display:block;background:#eaf1fb;color:#1b4f8a}
+
+  details.method{margin-top:22px}
+  details.method summary{cursor:pointer;font-weight:700;color:var(--navy);padding:14px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;list-style:none}
+  details.method summary::-webkit-details-marker{display:none}
+  details.method[open] summary{border-radius:12px 12px 0 0}
+  .method .body{border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;padding:18px;background:#fff;font-size:13.5px;color:#3a4457}
+  .method .body ul{margin:6px 0 14px;padding-left:20px}
+  .method table{font-size:13px;margin-top:6px}
+  .method .body h4{margin:14px 0 4px;color:var(--navy)}
+  .method code{background:#eef2f8;padding:1px 5px;border-radius:5px;font-size:12px}
+
+  footer{color:var(--muted);font-size:12.5px;text-align:center;padding:26px 0 40px}
+
+  @media(max-width:900px){
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .podium{grid-template-columns:1fr}
+    .detail .grid{grid-template-columns:1fr 1fr}
+    .top .hint{display:none}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">U</div>
+      <div>
+        <h1>Ranking de Posts</h1>
+        <div class="sub">UniCPO · Marketing · Score de performance 0–100</div>
+      </div>
+    </div>
+    <div class="hint">O ranking pondera geração de seguidores, engajamento qualificado e visualizações — com escala logarítmica para o tráfego pago não dominar o resultado.</div>
+  </div>
+</header>
+
+<nav class="tabsbar"><div class="wrap" id="tabs"></div></nav>
+
+<main class="wrap">
+  <div id="view"></div>
+
+  <details class="method">
+    <summary>Como o score é calculado (metodologia)</summary>
+    <div class="body">
+      <p>Cada post recebe uma nota de <b>0 a 100</b>. As visualizações sofrem influência direta do tráfego pago, então o ranking não usa apenas números absolutos: também mede a <b>eficiência</b> de cada vídeo em transformar audiência em seguidores.</p>
+      <p>Em cada sub-critério, o melhor post do mês recebe a pontuação cheia daquele item e os demais são normalizados proporcionalmente (mín–máx).</p>
+
+      <h4>1. Geração de seguidores — 55%</h4>
+      <ul>
+        <li><b>27,5%</b> — total de seguidores conquistados (resultado absoluto)</li>
+        <li><b>27,5%</b> — seguidores conquistados a cada 1.000 visualizações (eficiência)</li>
+      </ul>
+
+      <h4>2. Engajamento — 35%</h4>
+      <ul>
+        <li><b>14%</b> — volume total de engajamento ponderado</li>
+        <li><b>21%</b> — engajamento ponderado proporcional às visualizações</li>
+      </ul>
+      <p>Pesos por ação — ações que demonstram mais intenção valem mais:</p>
+      <table>
+        <tr><th style="text-align:left">Ação</th><th style="text-align:left">Peso</th></tr>
+        <tr><td>Like</td><td>1</td></tr>
+        <tr><td>Comentário</td><td>2</td></tr>
+        <tr><td>Repost, envio e salvamento</td><td>3</td></tr>
+      </table>
+
+      <h4>3. Visualizações — 10%</h4>
+      <p>Continuam contando, com peso reduzido. Aplica-se uma <b>escala logarítmica</b> — ln(1 + visualizações) — que reduz o impacto de números muito fora da curva, evitando que um único vídeo com centenas de milhares de views domine o ranking automaticamente.</p>
+
+      <p style="margin-top:14px;color:var(--muted)">Fórmula: <code>Score = 27,5·nSegAbs + 27,5·nSeg1k + 14·nEngTotal + 21·nEngView + 10·nLogViews</code> — onde <code>n</code> é a normalização mín–máx entre os posts do mês.</p>
+    </div>
+  </details>
+</main>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h3 id="modalTitle">Adicionar mês</h3>
+    <div class="field row2">
+      <div>
+        <label>Mês</label>
+        <select id="mMonth"></select>
+      </div>
+      <div>
+        <label>Ano</label>
+        <input class="txt" id="mYear" type="number" min="2020" max="2100" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Relatório em PDF</label>
+      <input class="txt" id="mFile" type="file" accept="application/pdf" />
+    </div>
+    <div class="field">
+      <label>Ou cole os dados (opcional — colunas separadas por TAB, vírgula ou 2+ espaços)</label>
+      <textarea class="txt" id="mPaste" rows="3" style="resize:vertical" placeholder="Nome do vídeo   Like   Comentário   Repost   Envio   Salvamento   Visualizações   Seguidores"></textarea>
+    </div>
+    <div class="msg" id="mMsg"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+      <button class="btn" id="mCancel">Cancelar</button>
+      <button class="btn primary" id="mSave">Processar e salvar</button>
+    </div>
+  </div>
+</div>
+
+<footer>UniCPO · Ranking de Posts — os dados ficam salvos apenas neste navegador. A cada mês, suba o novo PDF pela aba correspondente.</footer>
+
+<script>
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const STORE_KEY = "unicpo_ranking_v2";
+const ACTIVE_KEY = "unicpo_ranking_active";
+
+/* ---------- seed: dados do PDF de Agosto/2026 ---------- */
+const SEED = {"2026-08":{label:"Agosto 2026",createdAt:Date.now(),posts:[
+["Aniversário de Bauru",190,11,15,25,7,9513,0],
+["Dr. Porto - Historia",64,8,5,3,2,4187,0],
+["Dr. Patrick - Tecnico - Sutura",240,38,10,48,91,95953,38],
+["PodCast - Thiago e John",219,13,18,14,11,8918,11],
+["UniCPO: Estrutura com aluna",130,8,10,5,3,9641,1],
+["Assinatura na Tela - Protesis",232,17,20,45,14,16288,4],
+["Dia dos Pais - Depoimento",84,12,9,9,4,4664,0],
+["Curso Radiologia",61,9,4,6,1,4217,0],
+["Tirando foto da estrutura - Trend",143,7,8,16,6,11167,0],
+["Depoimento Cindy - Mini Implantes",137,18,8,14,3,6563,1],
+["Tour SIN",135,9,17,34,10,6266,4],
+["Odontologia enfoque principal - Thiago",50,8,10,9,2,6643,1],
+["Depoimento Geraldine - Orto",139,38,13,44,5,18000,6],
+["Tecnica - John Exocad",62,5,5,2,9,4435,2],
+["Playlist UniCPO",157,17,11,30,11,9894,2],
+["Depoimento - Dra. Nicole - Orto",41,7,3,9,2,3612,0],
+["Tour virtual",44,10,9,7,7,3981,0],
+["O que UniCPO significa para você",159,63,20,12,7,9710,2],
+["Ping Pong - Dentistica",152,12,12,19,7,6704,1],
+["Tecnico - Ludmila",97,9,5,9,7,5479,0],
+["Formatura AOF e DENTISTICA",171,11,9,17,17,114574,20],
+["Tecnico - Augusto - Rinomodelacion",4298,123,128,2529,4300,700000,1943],
+["Assinatura na Tela - Formatura",246,13,16,14,8,16758,2],
+["Porque escolhi UniCPO",138,12,2,12,5,6457,5],
+["Depoimento - Camila Cordero",275,69,8,20,8,28412,5],
+["Thiago - Una Noche muy Especial",178,15,13,10,5,5752,5],
+["Carrossel - Porto",162,21,5,6,6,8700,2],
+["Carrossel - Fotos - Alunos",74,6,7,13,3,19214,0],
+["Carrossel - Fotos - Alunos (5/09)",141,12,9,14,4,10862,3],
+["Carrossel - Fotos - Alunos (07/09)",58,5,2,5,0,12204,0],
+["Carrossel - Fotos - Alunos (11/09)",85,7,2,6,1,14005,1],
+["Carrossel - Fotos - Alunos (12/09)",139,4,6,12,5,22732,0],
+["Carrossel - Fotos - Alunos (13/09)",100,10,4,10,3,13137,0],
+["Carrossel - Fotos - Alunos (17/09)",91,5,4,12,2,15882,3],
+["Carrossel - Fotos - Alunos (18/09)",137,3,0,17,3,15786,1],
+["Carrossel - Fotos - Alunos (19/09)",96,5,3,18,2,15298,2],
+["Carrossel - Fotos - Alunos (20/09)",329,7,1,14,16,43238,1],
+["Carrossel - Fotos - Alunos (24/09)",151,5,6,20,4,22076,3],
+["Carrossel - Fotos Bandeiras",54,3,1,10,4,8127,0],
+["Carrossel - Fotos - Alunos (26/09)",50,5,2,1,3,9628,0],
+["Carrossel - Fotos - Alunos (27/09)",160,5,4,3,6,27767,0],
+["Carrossel - Fotos - Alunos (31/09)",113,5,0,11,6,16893,0]
+].map(r=>({video:r[0],like:r[1],comentario:r[2],repost:r[3],envio:r[4],salvamento:r[5],views:r[6],seguidores:r[7]}))}};
+
+/* ---------- store ---------- */
+function load(){
+  const raw = localStorage.getItem(STORE_KEY);
+  if(!raw){ const s={months:SEED}; localStorage.setItem(STORE_KEY,JSON.stringify(s)); return s; }
+  try{ const s=JSON.parse(raw); s.months=s.months||{}; return s; }catch(e){ return {months:{}}; }
+}
+function save(s){ localStorage.setItem(STORE_KEY,JSON.stringify(s)); }
+let store = load();
+let active = localStorage.getItem(ACTIVE_KEY);
+let sortKey = "score", sortDir = -1;
+const expanded = new Set();
+
+const fmt = n => (n||0).toLocaleString("pt-BR");
+const f1 = n => (Math.round(n*10)/10).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const fN = (n,d) => n.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* ---------- scoring ---------- */
+function scoreMonth(posts){
+  const d = posts.map(p=>{
+    const engRaw = p.like + p.comentario*2 + (p.repost+p.envio+p.salvamento)*3;
+    const views = Math.max(0,p.views||0);
+    return {
+      p, views, engRaw,
+      engPerView: views>0 ? engRaw/views : 0,
+      folAbs: p.seguidores||0,
+      folPer1k: views>0 ? (p.seguidores||0)*1000/views : 0,
+      viewsLog: Math.log(1+views)
+    };
+  });
+  const norm = key => {
+    const v = d.map(o=>o[key]);
+    const mn = Math.min(...v), mx = Math.max(...v);
+    return x => mx===mn ? (mx===0?0:1) : (x-mn)/(mx-mn);
+  };
+  const nA=norm("folAbs"), nE=norm("folPer1k"), nR=norm("engRaw"), nV=norm("engPerView"), nL=norm("viewsLog");
+  d.forEach(o=>{
+    o.s1 = nA(o.folAbs)*27.5;
+    o.s2 = nE(o.folPer1k)*27.5;
+    o.s3 = nR(o.engRaw)*14;
+    o.s4 = nV(o.engPerView)*21;
+    o.s5 = nL(o.viewsLog)*10;
+    o.score = o.s1+o.s2+o.s3+o.s4+o.s5;
+  });
+  d.sort((a,b)=>b.score-a.score);
+  d.forEach((o,i)=>o.rank=i+1);
+  return d;
+}
+
+/* ---------- PDF / text parsing ---------- */
+async function parsePDF(file){
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+  const lines = [];
+  for(let i=1;i<=pdf.numPages;i++){
+    const page = await pdf.getPage(i);
+    const c = await page.getTextContent();
+    const rows = {};
+    c.items.forEach(it=>{
+      if(!it.str.trim()) return;
+      const y = Math.round(it.transform[5]/2)*2;
+      (rows[y] = rows[y]||[]).push({s:it.str,x:it.transform[4]});
+    });
+    Object.keys(rows).sort((a,b)=>b-a).forEach(y=>{
+      lines.push(rows[y].sort((a,b)=>a.x-b.x).map(o=>o.s).join(" ").replace(/\s+/g," ").trim());
+    });
+  }
+  return parseLines(lines);
+}
+function parseLines(lines){
+  const rx = /^(.+?)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)$/;
+  const num = s => parseInt(String(s).replace(/\./g,"").replace(/[^\d]/g,""),10)||0;
+  const out = [];
+  for(let ln of lines){
+    ln = (ln||"").trim();
+    if(!ln) continue;
+    if(/like/i.test(ln) && /coment/i.test(ln)) continue;
+    let m = ln.match(rx);
+    if(!m){
+      const parts = ln.split(/\t+|\s*,\s*|\s{2,}/).filter(Boolean);
+      if(parts.length>=8){
+        const tail = parts.slice(-7);
+        if(tail.every(t=>/^\d[\d.]*$/.test(t.trim())))
+          m = [null, parts.slice(0,parts.length-7).join(" "), ...tail];
+      }
+    }
+    if(!m) continue;
+    out.push({
+      video:m[1].trim(), like:num(m[2]), comentario:num(m[3]), repost:num(m[4]),
+      envio:num(m[5]), salvamento:num(m[6]), views:num(m[7]), seguidores:num(m[8])
+    });
+  }
+  return out;
+}
+
+/* ---------- render ---------- */
+function monthKeys(){ return Object.keys(store.months).sort().reverse(); }
+
+function renderTabs(){
+  const keys = monthKeys();
+  if(active && !store.months[active]) active = null;
+  if(!active) active = keys[0] || null;
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  keys.forEach(k=>{
+    const b = document.createElement("button");
+    b.className = "tab" + (k===active?" active":"");
+    b.innerHTML = `${store.months[k].label} <span class="del" title="Remover mês">✕</span>`;
+    b.onclick = e=>{
+      if(e.target.classList.contains("del")){
+        if(confirm(`Remover "${store.months[k].label}" do ranking?`)){
+          delete store.months[k]; save(store);
+          if(active===k) active=null;
+          renderTabs(); renderView();
+        }
+        return;
+      }
+      active = k; localStorage.setItem(ACTIVE_KEY,k); renderTabs(); renderView();
+    };
+    el.appendChild(b);
+  });
+  const add = document.createElement("button");
+  add.className = "tab add";
+  add.textContent = "＋ Adicionar mês";
+  add.onclick = ()=>openModal();
+  el.appendChild(add);
+}
+
+function renderView(){
+  const view = document.getElementById("view");
+  const key = active;
+  if(!key || !store.months[key]){
+    view.innerHTML = `
+      <div class="card pad">
+        <div class="up">
+          <h3>Nenhum mês carregado</h3>
+          <p>Adicione um mês e envie o relatório em PDF dos posts. O ranking é calculado automaticamente.</p>
+          <button class="btn primary" onclick="openModal()">＋ Adicionar mês</button>
+        </div>
+      </div>`;
+    return;
+  }
+  const m = store.months[key];
+  const data = scoreMonth(m.posts);
+  const totV = m.posts.reduce((a,p)=>a+(p.views||0),0);
+  const totF = m.posts.reduce((a,p)=>a+(p.seguidores||0),0);
+  const totE = m.posts.reduce((a,p)=>a+p.like+p.comentario+p.repost+p.envio+p.salvamento,0);
+
+  const podium = data.slice(0,3).map((o,i)=>`
+    <div class="card pod p${i+1}">
+      <div class="medal">${i+1}</div>
+      <div class="name">${esc(o.p.video)}</div>
+      <div class="score">${f1(o.score)}<span> / 100</span></div>
+      <div class="mini">${bar(o)}</div>
+    </div>`).join("");
+
+  const rows = applySort(data).map(o=>rowHTML(o)).join("");
+
+  view.innerHTML = `
+    <div class="cards">
+      <div class="card kpi"><div class="lbl">Posts no mês</div><div class="val">${fmt(m.posts.length)}</div></div>
+      <div class="card kpi"><div class="lbl">Seguidores gerados</div><div class="val">${fmt(totF)}</div></div>
+      <div class="card kpi"><div class="lbl">Visualizações</div><div class="val">${fmt(totV)}</div></div>
+      <div class="card kpi"><div class="lbl">Interações</div><div class="val">${fmt(totE)}</div></div>
+    </div>
+
+    <div class="podium">${podium}</div>
+
+    <div class="card pad">
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="Filtrar por nome do vídeo…" />
+        <span class="grow"></span>
+        <button class="btn" id="reupload">↻ Atualizar PDF deste mês</button>
+        <button class="btn gold" id="csv">Exportar CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            ${th("rank","#")}${th("video","Vídeo")}${th("score","Score")}
+            ${th("folAbs","Seguidores")}${th("folPer1k","Seg / 1k views")}
+            ${th("engRaw","Engaj. total")}${th("engPerView","Engaj. / view")}
+            ${th("views","Visualizações")}
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span><b class="seg1"></b>Seguidores abs. · 27,5</span>
+        <span><b class="seg2"></b>Seguidores / 1k · 27,5</span>
+        <span><b class="seg3"></b>Engaj. total · 14</span>
+        <span><b class="seg4"></b>Engaj. / view · 21</span>
+        <span><b class="seg5"></b>Visualizações · 10</span>
+      </div>
+    </div>`;
+
+  document.getElementById("q").oninput = e=>{
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll("tbody tr[data-v]").forEach(tr=>{
+      const hit = tr.getAttribute("data-v").toLowerCase().includes(term);
+      tr.style.display = hit ? "" : "none";
+      const det = tr.nextElementSibling;
+      if(det && det.classList.contains("detail"))
+        det.style.display = (hit && expanded.has(tr.getAttribute("data-v"))) ? "" : "none";
+    });
+  };
+  document.getElementById("reupload").onclick = ()=>openModal(key);
+  document.getElementById("csv").onclick = ()=>exportCSV(m,data);
+  document.querySelectorAll("thead th").forEach(t=>{
+    t.onclick = ()=>{ const k=t.dataset.k; if(!k) return;
+      if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir = (k==="video")?1:-1; }
+      renderView();
+    };
+  });
+  document.querySelectorAll("tbody tr[data-v]").forEach(tr=>{
+    tr.onclick = ()=>{ const v=tr.getAttribute("data-v");
+      if(expanded.has(v)) expanded.delete(v); else expanded.add(v);
+      renderView();
+    };
+  });
+}
+
+function th(k,label){
+  const on = sortKey===k;
+  return `<th data-k="${k}" class="${on?'sorted':''}">${label}${on?(sortDir<0?' ▾':' ▴'):''}</th>`;
+}
+function applySort(data){
+  const d = data.slice();
+  d.sort((a,b)=>{
+    let av,bv;
+    if(sortKey==="rank"||sortKey==="score"){av=a.score;bv=b.score;}
+    else if(sortKey==="video"){av=a.p.video.toLowerCase();bv=b.p.video.toLowerCase();return av<bv?-sortDir:av>bv?sortDir:0;}
+    else {av=a[sortKey];bv=b[sortKey];}
+    return (av-bv)*sortDir;
+  });
+  return d;
+}
+function bar(o){
+  const segs=[["seg1",o.s1],["seg2",o.s2],["seg3",o.s3],["seg4",o.s4],["seg5",o.s5]];
+  return `<div class="bar">${segs.map(s=>`<i class="${s[0]}" style="width:${s[1]}%"></i>`).join("")}</div>`;
+}
+function rowHTML(o){
+  const v = o.p.video;
+  const open = expanded.has(v);
+  const main = `<tr data-v="${esc(v)}">
+    <td class="rankcell ${o.rank===1?'rank1':''}">${o.rank}</td>
+    <td class="vid">${esc(v)}</td>
+    <td class="scorecell">${f1(o.score)}</td>
+    <td>${fmt(o.folAbs)}</td>
+    <td>${fN(o.folPer1k,2)}</td>
+    <td>${fmt(o.engRaw)}</td>
+    <td>${fN(o.engPerView,3)}</td>
+    <td>${fmt(o.views)}</td>
+  </tr>`;
+  const det = `<tr class="detail" style="${open?'':'display:none'}"><td colspan="8">
+    <div style="margin-bottom:8px">${bar(o)}</div>
+    <div class="grid">
+      <div>Seguidores (abs.)<b>${f1(o.s1)} pts</b>${fmt(o.folAbs)} seguidores</div>
+      <div>Seguidores / 1k views<b>${f1(o.s2)} pts</b>${fN(o.folPer1k,2)} por 1.000</div>
+      <div>Engajamento total<b>${f1(o.s3)} pts</b>${fmt(o.engRaw)} ponderado</div>
+      <div>Engajamento / view<b>${f1(o.s4)} pts</b>${fN(o.engPerView,4)}</div>
+      <div>Visualizações (log)<b>${f1(o.s5)} pts</b>${fmt(o.views)} views</div>
+    </div>
+  </td></tr>`;
+  return main+det;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function exportCSV(m,data){
+  const head = ["Rank","Video","Score","Seguidores","Seg_por_1k_views","Engajamento_total","Engajamento_por_view","Visualizacoes","Like","Comentario","Repost","Envio","Salvamento"];
+  const lines = [head.join(";")];
+  data.forEach(o=>lines.push([
+    o.rank, `"${o.p.video.replace(/"/g,'""')}"`, f1(o.score), o.folAbs, fN(o.folPer1k,2).replace(".",""),
+    o.engRaw, o.engPerView.toFixed(4).replace(".",","), o.views, o.p.like, o.p.comentario, o.p.repost, o.p.envio, o.p.salvamento
+  ].join(";")));
+  const blob = new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `ranking-${m.label.replace(/\s+/g,"-").toLowerCase()}.csv`;
+  a.click();
+}
+
+/* ---------- modal ---------- */
+const modal = document.getElementById("modal");
+function openModal(key){
+  const now = new Date();
+  const sel = document.getElementById("mMonth");
+  sel.innerHTML = MONTHS.map((m,i)=>`<option value="${i}">${m}</option>`).join("");
+  if(key){
+    const [y,mm] = key.split("-");
+    document.getElementById("mYear").value = y;
+    sel.value = String(parseInt(mm,10)-1);
+    document.getElementById("modalTitle").textContent = "Atualizar: "+store.months[key].label;
+  } else {
+    document.getElementById("mYear").value = now.getFullYear();
+    sel.value = String(now.getMonth());
+    document.getElementById("modalTitle").textContent = "Adicionar mês";
+  }
+  document.getElementById("mFile").value = "";
+  document.getElementById("mPaste").value = "";
+  msg("");
+  modal.classList.add("open");
+}
+function closeModal(){ modal.classList.remove("open"); }
+function msg(t,type){ const e=document.getElementById("mMsg"); e.className="msg"+(type?" "+type:""); e.textContent=t; }
+
+document.getElementById("mCancel").onclick = closeModal;
+modal.onclick = e=>{ if(e.target===modal) closeModal(); };
+document.getElementById("mSave").onclick = async ()=>{
+  const mi = parseInt(document.getElementById("mMonth").value,10);
+  const yr = parseInt(document.getElementById("mYear").value,10);
+  if(!yr){ msg("Informe o ano.","err"); return; }
+  const key = `${yr}-${String(mi+1).padStart(2,"0")}`;
+  const label = `${MONTHS[mi]} ${yr}`;
+  const file = document.getElementById("mFile").files[0];
+  const paste = document.getElementById("mPaste").value.trim();
+
+  let posts = [];
+  try{
+    if(file){
+      msg("Lendo PDF…","info");
+      posts = await parsePDF(file);
+    } else if(paste){
+      posts = parseLines(paste.split(/\r?\n/));
+    } else {
+      msg("Envie um PDF ou cole os dados.","err"); return;
+    }
+  }catch(err){
+    console.error(err);
+    msg("Não consegui ler o PDF automaticamente. Cole os dados no campo de texto abaixo.","err"); return;
+  }
+  if(!posts.length){ msg("Nenhuma linha de post reconhecida. Verifique o arquivo ou cole os dados manualmente.","err"); return; }
+
+  store.months[key] = { label, createdAt: Date.now(), posts };
+  save(store);
+  active = key; localStorage.setItem(ACTIVE_KEY,key);
+  msg(`${posts.length} posts carregados.`,"ok");
+  renderTabs();
+  setTimeout(()=>{ closeModal(); renderView(); }, 500);
+};
+
+/* ---------- init ---------- */
+renderTabs();
+renderView();
+</script>
+</body>
+</html>
