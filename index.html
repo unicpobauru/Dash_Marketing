@@ -309,6 +309,7 @@ function scoreMonth(posts){
     const views = Math.max(0,p.views||0);
     return {
       p, views, engRaw,
+      like:p.like, comentario:p.comentario, repost:p.repost, envio:p.envio, salvamento:p.salvamento,
       engPerView: views>0 ? engRaw/views : 0,
       folAbs: p.seguidores||0,
       folPer1k: views>0 ? (p.seguidores||0)*1000/views : 0,
@@ -466,6 +467,8 @@ function renderView(){
             ${th("rank","#")}${th("video","Vídeo")}${th("score","Score")}
             ${th("folAbs","Seguidores")}${th("folPer1k","Seg / 1k views")}
             ${th("engRaw","Engaj. total")}${th("engPerView","Engaj. / view")}
+            ${th("like","Curtidas")}${th("comentario","Comentários")}${th("repost","Repost")}
+            ${th("envio","Encaminh.")}${th("salvamento","Salvam.")}
             ${th("views","Visualizações")}
           </tr></thead>
           <tbody>${rows}</tbody>
@@ -536,9 +539,14 @@ function rowHTML(o){
     <td>${fN(o.folPer1k,2)}</td>
     <td>${fmt(o.engRaw)}</td>
     <td>${fN(o.engPerView,3)}</td>
+    <td>${fmt(o.like)}</td>
+    <td>${fmt(o.comentario)}</td>
+    <td>${fmt(o.repost)}</td>
+    <td>${fmt(o.envio)}</td>
+    <td>${fmt(o.salvamento)}</td>
     <td>${fmt(o.views)}</td>
   </tr>`;
-  const det = `<tr class="detail" style="${open?'':'display:none'}"><td colspan="8">
+  const det = `<tr class="detail" style="${open?'':'display:none'}"><td colspan="13">
     <div style="margin-bottom:8px">${bar(o)}</div>
     <div class="grid">
       <div>Seguidores (abs.)<b>${f1(o.s1)} pts</b>${fmt(o.folAbs)} seguidores</div>
