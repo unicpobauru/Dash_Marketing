@@ -17,18 +17,20 @@
     --shadow:0 1px 2px rgba(16,40,80,.06), 0 8px 24px rgba(16,40,80,.08);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{margin:0;background:var(--bg);background-image:linear-gradient(178deg,#e6effb 0%,#eef2f8 340px);background-repeat:no-repeat;color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
   h1,h2,h3{font-family:Poppins,Inter,sans-serif;margin:0}
   a{color:var(--blue)}
   .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
-  header.top{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;border-bottom:4px solid var(--gold)}
-  .top .wrap{padding:26px 20px 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:14px}
-  .brand .mark{width:46px;height:46px;border-radius:12px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-family:Poppins;font-weight:800;font-size:20px;letter-spacing:.5px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-  .brand h1{font-size:22px;letter-spacing:.2px}
-  .brand .sub{font-size:12.5px;color:#bcd0ea;font-weight:500;margin-top:2px}
-  .top .hint{font-size:12px;color:#a9c1de;max-width:340px;text-align:right}
+  header.top{background:linear-gradient(120deg,var(--navy) 0%,var(--navy-2) 55%,#134a91 100%);color:#fff;border-bottom:4px solid var(--gold);position:relative;overflow:hidden}
+  header.top::after{content:"";position:absolute;top:-120px;right:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(201,162,75,.35),transparent 68%);pointer-events:none}
+  header.top::before{content:"";position:absolute;left:-60px;bottom:-160px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(79,154,224,.28),transparent 70%);pointer-events:none}
+  .top .wrap{padding:24px 20px 22px;display:flex;align-items:center;gap:18px;position:relative}
+  .brand{display:flex;align-items:center;gap:16px}
+  .brand .logo{height:46px;width:auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.28))}
+  .brand .divider{width:1px;height:40px;background:linear-gradient(var(--gold),transparent)}
+  .brand h1{font-size:21px;letter-spacing:.2px}
+  .brand .sub{font-size:12.5px;color:#bcd0ea;font-weight:500;margin-top:3px}
 
   .tabsbar{background:var(--navy-2);border-bottom:1px solid rgba(255,255,255,.08)}
   .tabsbar .wrap{display:flex;align-items:center;gap:6px;padding:0 20px;overflow-x:auto}
@@ -44,19 +46,27 @@
   .pad{padding:20px}
 
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-  .kpi{padding:16px 18px}
+  .kpi{padding:15px 18px;border-top:3px solid var(--blue);position:relative}
   .kpi .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
   .kpi .val{font-family:Poppins;font-weight:800;font-size:26px;margin-top:4px;color:var(--navy)}
   .kpi .val small{font-size:13px;color:var(--muted);font-weight:600}
+  .kpi.k1{border-top-color:var(--blue);background:linear-gradient(180deg,#f1f7ff,#fff 62%)}
+  .kpi.k2{border-top-color:var(--gold);background:linear-gradient(180deg,#fdf8ec,#fff 62%)}
+  .kpi.k3{border-top-color:#12a89f;background:linear-gradient(180deg,#ecfaf8,#fff 62%)}
+  .kpi.k4{border-top-color:#6366e8;background:linear-gradient(180deg,#f2f1ff,#fff 62%)}
+  .kpi.k2 .val{color:var(--gold-dark)} .kpi.k3 .val{color:#0d7d76} .kpi.k4 .val{color:#4a4dd0}
 
   .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
   .pod{padding:18px;position:relative;overflow:hidden}
   .pod::before{content:"";position:absolute;inset:0 auto 0 0;width:5px}
-  .pod.p1::before{background:var(--gold)}
+  .pod.p1{background:linear-gradient(180deg,#fdf5e3,#fff 72%);box-shadow:0 0 0 1px var(--gold-soft),0 14px 34px rgba(201,162,75,.22)}
+  .pod.p2{background:linear-gradient(180deg,#f4f6f9,#fff 72%)}
+  .pod.p3{background:linear-gradient(180deg,#fbf3ec,#fff 72%)}
+  .pod.p1::before{background:linear-gradient(var(--gold),var(--gold-dark))}
   .pod.p2::before{background:#9fb0c2}
   .pod.p3::before{background:#c58b4d}
-  .pod .medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:Poppins;font-weight:800;color:#fff;font-size:15px}
-  .pod.p1 .medal{background:var(--gold)}
+  .pod .medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:Poppins;font-weight:800;color:#fff;font-size:15px;box-shadow:0 3px 10px rgba(16,40,80,.18)}
+  .pod.p1 .medal{background:linear-gradient(135deg,var(--gold),var(--gold-dark))}
   .pod.p2 .medal{background:#9fb0c2}
   .pod.p3 .medal{background:#c58b4d}
   .pod .name{font-weight:700;margin:10px 0 2px;font-size:14.5px;min-height:40px}
@@ -116,8 +126,8 @@
   .msg.err{display:block;background:#fdecec;color:#a52a2a}
   .msg.info{display:block;background:#eaf1fb;color:#1b4f8a}
 
-  details.method{margin-top:22px}
-  details.method summary{cursor:pointer;font-weight:700;color:var(--navy);padding:14px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;list-style:none}
+  details.method{margin-top:22px;border-radius:12px;box-shadow:var(--shadow)}
+  details.method summary{cursor:pointer;font-weight:700;color:#fff;padding:14px 18px;background:linear-gradient(120deg,var(--navy),var(--navy-2));border-radius:12px;list-style:none;border-left:4px solid var(--gold)}
   details.method summary::-webkit-details-marker{display:none}
   details.method[open] summary{border-radius:12px 12px 0 0}
   .method .body{border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;padding:18px;background:#fff;font-size:13.5px;color:#3a4457}
@@ -126,13 +136,14 @@
   .method .body h4{margin:14px 0 4px;color:var(--navy)}
   .method code{background:#eef2f8;padding:1px 5px;border-radius:5px;font-size:12px}
 
-  footer{color:var(--muted);font-size:12.5px;text-align:center;padding:26px 0 40px}
+  footer{margin-top:28px;background:linear-gradient(120deg,var(--navy),var(--navy-2));border-top:3px solid var(--gold);color:#a9c1de;font-size:12.5px;text-align:center;padding:22px 20px 26px}
+  footer img{height:26px;opacity:.9;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto}
 
   @media(max-width:900px){
     .cards{grid-template-columns:repeat(2,1fr)}
     .podium{grid-template-columns:1fr}
     .detail .grid{grid-template-columns:1fr 1fr}
-    .top .hint{display:none}
+    .brand .logo{height:38px}
   }
 </style>
 </head>
@@ -140,13 +151,13 @@
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <div class="mark">U</div>
+      <img class="logo" src="logo-unicpo.png" alt="UniCPO" />
+      <div class="divider"></div>
       <div>
         <h1>Ranking de Posts</h1>
-        <div class="sub">UniCPO · Marketing · Score de performance 0–100</div>
+        <div class="sub">Marketing · Score de performance 0–100</div>
       </div>
     </div>
-    <div class="hint">O ranking pondera geração de seguidores, engajamento qualificado e visualizações — com escala logarítmica para o tráfego pago não dominar o resultado.</div>
   </div>
 </header>
 
@@ -217,7 +228,10 @@
   </div>
 </div>
 
-<footer>UniCPO · Ranking de Posts — os dados ficam salvos apenas neste navegador. A cada mês, suba o novo PDF pela aba correspondente.</footer>
+<footer>
+  <img src="logo-unicpo.png" alt="UniCPO" />
+  Ranking de Posts — os dados ficam salvos apenas neste navegador. A cada mês, suba o novo PDF pela aba correspondente.
+</footer>
 
 <script>
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -431,10 +445,10 @@ function renderView(){
 
   view.innerHTML = `
     <div class="cards">
-      <div class="card kpi"><div class="lbl">Posts no mês</div><div class="val">${fmt(m.posts.length)}</div></div>
-      <div class="card kpi"><div class="lbl">Seguidores gerados</div><div class="val">${fmt(totF)}</div></div>
-      <div class="card kpi"><div class="lbl">Visualizações</div><div class="val">${fmt(totV)}</div></div>
-      <div class="card kpi"><div class="lbl">Interações</div><div class="val">${fmt(totE)}</div></div>
+      <div class="card kpi k1"><div class="lbl">Posts no mês</div><div class="val">${fmt(m.posts.length)}</div></div>
+      <div class="card kpi k2"><div class="lbl">Seguidores gerados</div><div class="val">${fmt(totF)}</div></div>
+      <div class="card kpi k3"><div class="lbl">Visualizações</div><div class="val">${fmt(totV)}</div></div>
+      <div class="card kpi k4"><div class="lbl">Interações</div><div class="val">${fmt(totE)}</div></div>
     </div>
 
     <div class="podium">${podium}</div>
