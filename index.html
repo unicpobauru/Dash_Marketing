@@ -106,7 +106,7 @@
   .vid{font-weight:600;max-width:340px;white-space:normal}
   .scorecell{font-family:Poppins;font-weight:800;color:var(--navy);font-size:15px}
   .detail td{background:#f7f9fd;font-size:12.5px;color:var(--muted)}
-  .detail .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:left}
+  .detail .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;text-align:left}
   .detail .grid div{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
   .detail .grid b{display:block;color:var(--ink);font-size:14px;font-family:Poppins}
 
@@ -169,12 +169,13 @@
   <details class="method">
     <summary>Como o score é calculado (metodologia)</summary>
     <div class="body">
-      <p>Cada post recebe uma nota de <b>0 a 100</b>. O foco principal é a <b>geração de seguidores</b>, seguida do engajamento qualificado; as visualizações entram com peso reduzido e em escala logarítmica.</p>
+      <p>Cada post recebe uma nota de <b>0 a 100</b>. As visualizações sofrem influência direta do tráfego pago, então o ranking não usa apenas números absolutos: também mede a <b>eficiência</b> de cada vídeo em transformar audiência em seguidores.</p>
       <p>Em cada sub-critério, o melhor post do mês recebe a pontuação cheia daquele item e os demais são normalizados proporcionalmente (mín–máx).</p>
 
       <h4>1. Geração de seguidores — 55%</h4>
       <ul>
-        <li><b>55%</b> — total de seguidores conquistados (resultado absoluto)</li>
+        <li><b>27,5%</b> — total de seguidores conquistados (resultado absoluto)</li>
+        <li><b>27,5%</b> — seguidores conquistados a cada 1.000 visualizações (eficiência)</li>
       </ul>
 
       <h4>2. Engajamento — 35%</h4>
@@ -193,7 +194,7 @@
       <h4>3. Visualizações — 10%</h4>
       <p>Continuam contando, com peso reduzido. Aplica-se uma <b>escala logarítmica</b> — ln(1 + visualizações) — que reduz o impacto de números muito fora da curva, evitando que um único vídeo com centenas de milhares de views domine o ranking automaticamente.</p>
 
-      <p style="margin-top:14px;color:var(--muted)">Fórmula: <code>Score = 55·nSegTotal + 14·nEngTotal + 21·nEngView + 10·nLogViews</code> — onde <code>n</code> é a normalização mín–máx entre os posts do mês.</p>
+      <p style="margin-top:14px;color:var(--muted)">Fórmula: <code>Score = 27,5·nSegAbs + 27,5·nSeg1k + 14·nEngTotal + 21·nEngView + 10·nLogViews</code> — onde <code>n</code> é a normalização mín–máx entre os posts do mês.</p>
     </div>
   </details>
 </main>
@@ -311,6 +312,7 @@ function scoreMonth(posts){
       like:p.like, comentario:p.comentario, repost:p.repost, envio:p.envio, salvamento:p.salvamento,
       engPerView: views>0 ? engRaw/views : 0,
       folAbs: p.seguidores||0,
+      folPer1k: views>0 ? (p.seguidores||0)*1000/views : 0,
       viewsLog: Math.log(1+views)
     };
   });
@@ -319,13 +321,14 @@ function scoreMonth(posts){
     const mn = Math.min(...v), mx = Math.max(...v);
     return x => mx===mn ? (mx===0?0:1) : (x-mn)/(mx-mn);
   };
-  const nA=norm("folAbs"), nR=norm("engRaw"), nV=norm("engPerView"), nL=norm("viewsLog");
+  const nA=norm("folAbs"), nE=norm("folPer1k"), nR=norm("engRaw"), nV=norm("engPerView"), nL=norm("viewsLog");
   d.forEach(o=>{
-    o.s1 = nA(o.folAbs)*55;
+    o.s1 = nA(o.folAbs)*27.5;
+    o.s2 = nE(o.folPer1k)*27.5;
     o.s3 = nR(o.engRaw)*14;
     o.s4 = nV(o.engPerView)*21;
     o.s5 = nL(o.viewsLog)*10;
-    o.score = o.s1+o.s3+o.s4+o.s5;
+    o.score = o.s1+o.s2+o.s3+o.s4+o.s5;
   });
   d.sort((a,b)=>b.score-a.score);
   d.forEach((o,i)=>o.rank=i+1);
@@ -471,7 +474,8 @@ function renderView(){
         </table>
       </div>
       <div class="legend">
-        <span><b class="seg1"></b>Seguidores totais · 55</span>
+        <span><b class="seg1"></b>Seguidores abs. · 27,5</span>
+        <span><b class="seg2"></b>Seguidores / 1k · 27,5</span>
         <span><b class="seg3"></b>Engaj. total · 14</span>
         <span><b class="seg4"></b>Engaj. / view · 21</span>
         <span><b class="seg5"></b>Visualizações · 10</span>
@@ -520,7 +524,7 @@ function applySort(data){
   return d;
 }
 function bar(o){
-  const segs=[["seg1",o.s1],["seg3",o.s3],["seg4",o.s4],["seg5",o.s5]];
+  const segs=[["seg1",o.s1],["seg2",o.s2],["seg3",o.s3],["seg4",o.s4],["seg5",o.s5]];
   return `<div class="bar">${segs.map(s=>`<i class="${s[0]}" style="width:${s[1]}%"></i>`).join("")}</div>`;
 }
 function rowHTML(o){
@@ -541,7 +545,8 @@ function rowHTML(o){
   const det = `<tr class="detail" style="${open?'':'display:none'}"><td colspan="10">
     <div style="margin-bottom:8px">${bar(o)}</div>
     <div class="grid">
-      <div>Seguidores totais<b>${f1(o.s1)} pts</b>${fmt(o.folAbs)} seguidores</div>
+      <div>Seguidores (abs.)<b>${f1(o.s1)} pts</b>${fmt(o.folAbs)} seguidores</div>
+      <div>Seguidores / 1k views<b>${f1(o.s2)} pts</b>${fN(o.folPer1k,2)} por 1.000</div>
       <div>Engajamento total<b>${f1(o.s3)} pts</b>${fmt(o.engRaw)} ponderado</div>
       <div>Engajamento / view<b>${f1(o.s4)} pts</b>${fN(o.engPerView,4)}</div>
       <div>Visualizações (log)<b>${f1(o.s5)} pts</b>${fmt(o.views)} views</div>
@@ -552,10 +557,10 @@ function rowHTML(o){
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
 function exportCSV(m,data){
-  const head = ["Rank","Video","Score","Seguidores","Engajamento_total","Engajamento_por_view","Visualizacoes","Like","Comentario","Repost","Envio","Salvamento"];
+  const head = ["Rank","Video","Score","Seguidores","Seg_por_1k_views","Engajamento_total","Engajamento_por_view","Visualizacoes","Like","Comentario","Repost","Envio","Salvamento"];
   const lines = [head.join(";")];
   data.forEach(o=>lines.push([
-    o.rank, `"${o.p.video.replace(/"/g,'""')}"`, f1(o.score), o.folAbs,
+    o.rank, `"${o.p.video.replace(/"/g,'""')}"`, f1(o.score), o.folAbs, fN(o.folPer1k,2).replace(".",""),
     o.engRaw, o.engPerView.toFixed(4).replace(".",","), o.views, o.p.like, o.p.comentario, o.p.repost, o.p.envio, o.p.salvamento
   ].join(";")));
   const blob = new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
