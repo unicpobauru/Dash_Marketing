@@ -25,11 +25,16 @@
   header.top{background:linear-gradient(120deg,var(--navy) 0%,var(--navy-2) 55%,#134a91 100%);color:#fff;border-bottom:4px solid var(--gold);position:relative;overflow:hidden}
   header.top::after{content:"";position:absolute;top:-120px;right:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(201,162,75,.35),transparent 68%);pointer-events:none}
   header.top::before{content:"";position:absolute;left:-60px;bottom:-160px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(79,154,224,.28),transparent 70%);pointer-events:none}
-  .top .wrap{padding:24px 20px 22px;display:flex;align-items:center;gap:18px;position:relative}
+  .top .wrap{padding:24px 20px 22px;display:flex;align-items:center;gap:18px;position:relative;flex-wrap:wrap}
   .brand{display:flex;align-items:center;gap:16px}
   .brand .logo{height:46px;width:auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.28))}
   .brand .divider{width:1px;height:40px;background:linear-gradient(var(--gold),transparent)}
   .brand h1{font-size:21px;letter-spacing:.2px}
+  .switch{margin-left:auto;display:flex;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:5px;border-radius:14px}
+  .bsw{appearance:none;border:1px solid transparent;background:transparent;border-radius:10px;padding:9px 16px;cursor:pointer;display:flex;align-items:center;opacity:.6;transition:.15s}
+  .bsw img{height:22px;width:auto;display:block}
+  .bsw:hover{opacity:1}
+  .bsw.active{opacity:1;background:rgba(255,255,255,.16);border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,162,75,.35)}
   .brand .sub{font-size:12.5px;color:#bcd0ea;font-weight:500;margin-top:3px}
 
   .tabsbar{background:var(--navy-2);border-bottom:1px solid rgba(255,255,255,.08)}
@@ -144,6 +149,7 @@
     .podium{grid-template-columns:1fr}
     .detail .grid{grid-template-columns:1fr 1fr}
     .brand .logo{height:38px}
+    .switch{margin-left:0}
   }
 </style>
 </head>
@@ -151,13 +157,14 @@
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img class="logo" src="logo-unicpo.png" alt="UniCPO" />
+      <img class="logo" id="hdrLogo" src="logo-unicpo.png" alt="UniCPO" />
       <div class="divider"></div>
       <div>
         <h1>Ranking de Posts</h1>
         <div class="sub">Marketing · Score de performance 0–100</div>
       </div>
     </div>
+    <div class="switch" id="brandSwitch"></div>
   </div>
 </header>
 
@@ -229,7 +236,7 @@
 </div>
 
 <footer>
-  <img src="logo-unicpo.png" alt="UniCPO" />
+  <img id="ftLogo" src="logo-unicpo.png" alt="UniCPO" />
   Ranking de Posts — os dados ficam salvos apenas neste navegador. A cada mês, suba o novo PDF pela aba correspondente.
 </footer>
 
@@ -237,8 +244,14 @@
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-const STORE_KEY = "unicpo_ranking_v2";
+const STORE_KEY = "unicpo_ranking_v3";
+const OLD_KEY = "unicpo_ranking_v2";
 const ACTIVE_KEY = "unicpo_ranking_active";
+const BRAND_KEY = "unicpo_ranking_brand";
+const BRANDS = {
+  unicpo:  {name:"UniCPO",  logo:"logo-unicpo.png"},
+  fainter: {name:"FAINTER", logo:"logo-fainter.png"}
+};
 
 /* ---------- seed: dados do PDF de Agosto/2026 ---------- */
 const SEED = {"2026-08":{label:"Agosto 2026",createdAt:Date.now(),posts:[
@@ -287,14 +300,29 @@ const SEED = {"2026-08":{label:"Agosto 2026",createdAt:Date.now(),posts:[
 ].map(r=>({video:r[0],like:r[1],comentario:r[2],repost:r[3],envio:r[4],salvamento:r[5],views:r[6],seguidores:r[7]}))}};
 
 /* ---------- store ---------- */
-function load(){
-  const raw = localStorage.getItem(STORE_KEY);
-  if(!raw){ const s={months:SEED}; localStorage.setItem(STORE_KEY,JSON.stringify(s)); return s; }
-  try{ const s=JSON.parse(raw); s.months=s.months||{}; return s; }catch(e){ return {months:{}}; }
+function loadAll(){
+  const empty = ()=>({brands:{unicpo:{months:{}},fainter:{months:{}}}});
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){
+      const s = JSON.parse(raw); s.brands = s.brands||{};
+      Object.keys(BRANDS).forEach(b=>{ s.brands[b] = s.brands[b]||{months:{}}; s.brands[b].months = s.brands[b].months||{}; });
+      return s;
+    }
+    const s = empty();
+    const old = localStorage.getItem(OLD_KEY);
+    s.brands.unicpo.months = old ? (JSON.parse(old).months||{}) : SEED;
+    localStorage.setItem(STORE_KEY,JSON.stringify(s));
+    return s;
+  }catch(e){ return empty(); }
 }
-function save(s){ localStorage.setItem(STORE_KEY,JSON.stringify(s)); }
-let store = load();
-let active = localStorage.getItem(ACTIVE_KEY);
+let data = loadAll();
+let brand = localStorage.getItem(BRAND_KEY);
+if(!BRANDS[brand]) brand = "unicpo";
+const store = { get months(){ return data.brands[brand].months; } };
+function save(){ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }
+function activeKeyFor(b){ return ACTIVE_KEY+"_"+b; }
+let active = localStorage.getItem(activeKeyFor(brand)) || (brand==="unicpo" ? localStorage.getItem(ACTIVE_KEY) : null);
 let sortKey = "score", sortDir = -1;
 const expanded = new Set();
 
@@ -403,7 +431,7 @@ function renderTabs(){
         }
         return;
       }
-      active = k; localStorage.setItem(ACTIVE_KEY,k); renderTabs(); renderView();
+      active = k; localStorage.setItem(activeKeyFor(brand),k); renderTabs(); renderView();
     };
     el.appendChild(b);
   });
@@ -421,7 +449,7 @@ function renderView(){
     view.innerHTML = `
       <div class="card pad">
         <div class="up">
-          <h3>Nenhum mês carregado</h3>
+          <h3>${BRANDS[brand].name}: nenhum mês carregado</h3>
           <p>Adicione um mês e envie o relatório em PDF dos posts. O ranking é calculado automaticamente.</p>
           <button class="btn primary" onclick="openModal()">＋ Adicionar mês</button>
         </div>
@@ -566,7 +594,7 @@ function exportCSV(m,data){
   const blob = new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `ranking-${m.label.replace(/\s+/g,"-").toLowerCase()}.csv`;
+  a.download = `ranking-${brand}-${m.label.replace(/\s+/g,"-").toLowerCase()}.csv`;
   a.click();
 }
 
@@ -623,13 +651,31 @@ document.getElementById("mSave").onclick = async ()=>{
 
   store.months[key] = { label, createdAt: Date.now(), posts };
   save(store);
-  active = key; localStorage.setItem(ACTIVE_KEY,key);
+  active = key; localStorage.setItem(activeKeyFor(brand),key);
   msg(`${posts.length} posts carregados.`,"ok");
   renderTabs();
   setTimeout(()=>{ closeModal(); renderView(); }, 500);
 };
 
+/* ---------- marca (UniCPO / FAINTER) ---------- */
+function renderBrand(){
+  const b = BRANDS[brand];
+  const h = document.getElementById("hdrLogo"); h.src = b.logo; h.alt = b.name;
+  const f = document.getElementById("ftLogo"); f.src = b.logo; f.alt = b.name;
+  document.getElementById("brandSwitch").innerHTML = Object.keys(BRANDS).map(k=>
+    `<button class="bsw ${k===brand?'active':''}" data-b="${k}" title="${BRANDS[k].name}"><img src="${BRANDS[k].logo}" alt="${BRANDS[k].name}" /></button>`).join("");
+  document.querySelectorAll(".bsw").forEach(btn=>btn.onclick = ()=>setBrand(btn.dataset.b));
+}
+function setBrand(k){
+  if(k===brand) return;
+  brand = k; localStorage.setItem(BRAND_KEY,k);
+  active = localStorage.getItem(activeKeyFor(k)) || (k==="unicpo" ? localStorage.getItem(ACTIVE_KEY) : null);
+  expanded.clear();
+  renderBrand(); renderTabs(); renderView();
+}
+
 /* ---------- init ---------- */
+renderBrand();
 renderTabs();
 renderView();
 </script>
