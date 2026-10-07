@@ -33,6 +33,8 @@
   .switch{margin-left:auto;display:flex;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:5px;border-radius:14px}
   .bsw{appearance:none;border:1px solid transparent;background:transparent;border-radius:10px;padding:9px 16px;cursor:pointer;display:flex;align-items:center;opacity:.6;transition:.15s}
   .bsw img{height:22px;width:auto;display:block}
+  .btag{font-family:Poppins;font-weight:700;font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:3px 8px;border-radius:6px;margin-left:8px;white-space:nowrap}
+  .brand .btag{font-size:11px;margin-left:-6px}
   .bsw:hover{opacity:1}
   .bsw.active{opacity:1;background:rgba(255,255,255,.16);border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,162,75,.35)}
   .brand .sub{font-size:12.5px;color:#bcd0ea;font-weight:500;margin-top:3px}
@@ -158,6 +160,7 @@
   <div class="wrap">
     <div class="brand">
       <img class="logo" id="hdrLogo" src="logo-unicpo.png" alt="UniCPO" />
+      <span class="btag" id="hdrTag" hidden></span>
       <div class="divider"></div>
       <div>
         <h1>Ranking de Posts</h1>
@@ -250,7 +253,8 @@ const ACTIVE_KEY = "unicpo_ranking_active";
 const BRAND_KEY = "unicpo_ranking_brand";
 const BRANDS = {
   unicpo:  {name:"UniCPO",  logo:"logo-unicpo.png"},
-  fainter: {name:"FAINTER", logo:"logo-fainter.png"}
+  fainter: {name:"FAINTER", logo:"logo-fainter.png"},
+  clinica: {name:"Clínica UniCPO", logo:"logo-unicpo.png", tag:"Clínica"}
 };
 
 /* ---------- seed: dados do PDF de Agosto/2026 ---------- */
@@ -301,7 +305,7 @@ const SEED = {"2026-08":{label:"Agosto 2026",createdAt:Date.now(),posts:[
 
 /* ---------- store ---------- */
 function loadAll(){
-  const empty = ()=>({brands:{unicpo:{months:{}},fainter:{months:{}}}});
+  const empty = ()=>({brands:Object.fromEntries(Object.keys(BRANDS).map(k=>[k,{months:{}}]))});
   try{
     const raw = localStorage.getItem(STORE_KEY);
     if(raw){
@@ -662,8 +666,10 @@ function renderBrand(){
   const b = BRANDS[brand];
   const h = document.getElementById("hdrLogo"); h.src = b.logo; h.alt = b.name;
   const f = document.getElementById("ftLogo"); f.src = b.logo; f.alt = b.name;
+  const t = document.getElementById("hdrTag"); t.hidden = !b.tag; t.textContent = b.tag||"";
+  document.querySelector(".brand .sub").textContent = (b.tag ? b.name+" · " : "")+"Marketing · Score de performance 0–100";
   document.getElementById("brandSwitch").innerHTML = Object.keys(BRANDS).map(k=>
-    `<button class="bsw ${k===brand?'active':''}" data-b="${k}" title="${BRANDS[k].name}"><img src="${BRANDS[k].logo}" alt="${BRANDS[k].name}" /></button>`).join("");
+    `<button class="bsw ${k===brand?'active':''}" data-b="${k}" title="${BRANDS[k].name}"><img src="${BRANDS[k].logo}" alt="${BRANDS[k].name}" />${BRANDS[k].tag?`<span class="btag">${BRANDS[k].tag}</span>`:""}</button>`).join("");
   document.querySelectorAll(".bsw").forEach(btn=>btn.onclick = ()=>setBrand(btn.dataset.b));
 }
 function setBrand(k){

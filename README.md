@@ -5,7 +5,7 @@ relatório mensal em PDF. Roda 100% no navegador — nada é enviado para servid
 
 ## Funcionamento
 
-- **Duas marcas.** O seletor no topo alterna entre **UniCPO** e **FAINTER**; cada marca tem seus próprios meses e dados.
+- **Três abas de marca.** O seletor no topo alterna entre **UniCPO**, **FAINTER** e **Clínica UniCPO**; cada uma tem seus próprios meses e dados.
 - **Abas por mês.** Cada mês é uma aba. Agosto/2026 já vem carregado como exemplo.
 - **Upload de PDF.** Em "＋ Adicionar mês" (ou "↻ Atualizar PDF deste mês") você escolhe
   mês/ano e envia o PDF. O site lê a tabela `Vídeo | Like | Comentário | Repost | Envio |
