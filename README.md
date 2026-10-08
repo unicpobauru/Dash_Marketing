@@ -22,9 +22,10 @@ normalizados (mín–máx).
 
 | Bloco | Peso | Componentes |
 |---|---|---|
-| Geração de seguidores | 55% | 27,5% seguidores totais · 27,5% seguidores por 1.000 views |
-| Engajamento | 35% | 14% volume ponderado · 21% ponderado por view |
-| Visualizações | 10% | `ln(1 + views)` — escala log que reduz o peso de outliers |
+| Seguidores | 50% | `ln(1 + seguidores)` — escala log |
+| Engajamento total | 50% | `ln(1 + engajamento ponderado)` — escala log |
+
+As **visualizações não entram no cálculo** (são impulsionadas por tráfego pago).
 
 Pesos de engajamento: **Like = 1**, **Comentário = 2**, **Repost / Envio / Salvamento = 3**.
 
