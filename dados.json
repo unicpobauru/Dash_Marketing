@@ -1,0 +1,971 @@
+{
+ "version": 1,
+ "brands": {
+  "unicpo": {
+   "months": {
+    "2026-08": {
+     "label": "Agosto 2026",
+     "createdAt": 1788000000000,
+     "posts": [
+      {
+       "video": "Aniversário de Bauru",
+       "like": 190,
+       "comentario": 11,
+       "repost": 15,
+       "envio": 25,
+       "salvamento": 7,
+       "views": 9513,
+       "seguidores": 0
+      },
+      {
+       "video": "Dr. Porto - Historia",
+       "like": 64,
+       "comentario": 8,
+       "repost": 5,
+       "envio": 3,
+       "salvamento": 2,
+       "views": 4187,
+       "seguidores": 0
+      },
+      {
+       "video": "Dr. Patrick - Tecnico - Sutura",
+       "like": 240,
+       "comentario": 38,
+       "repost": 10,
+       "envio": 48,
+       "salvamento": 91,
+       "views": 95953,
+       "seguidores": 38
+      },
+      {
+       "video": "PodCast - Thiago e John",
+       "like": 219,
+       "comentario": 13,
+       "repost": 18,
+       "envio": 14,
+       "salvamento": 11,
+       "views": 8918,
+       "seguidores": 11
+      },
+      {
+       "video": "UniCPO: Estrutura com aluna",
+       "like": 130,
+       "comentario": 8,
+       "repost": 10,
+       "envio": 5,
+       "salvamento": 3,
+       "views": 9641,
+       "seguidores": 1
+      },
+      {
+       "video": "Assinatura na Tela - Protesis",
+       "like": 232,
+       "comentario": 17,
+       "repost": 20,
+       "envio": 45,
+       "salvamento": 14,
+       "views": 16288,
+       "seguidores": 4
+      },
+      {
+       "video": "Dia dos Pais - Depoimento",
+       "like": 84,
+       "comentario": 12,
+       "repost": 9,
+       "envio": 9,
+       "salvamento": 4,
+       "views": 4664,
+       "seguidores": 0
+      },
+      {
+       "video": "Curso Radiologia",
+       "like": 61,
+       "comentario": 9,
+       "repost": 4,
+       "envio": 6,
+       "salvamento": 1,
+       "views": 4217,
+       "seguidores": 0
+      },
+      {
+       "video": "Tirando foto da estrutura - Trend",
+       "like": 143,
+       "comentario": 7,
+       "repost": 8,
+       "envio": 16,
+       "salvamento": 6,
+       "views": 11167,
+       "seguidores": 0
+      },
+      {
+       "video": "Depoimento Cindy - Mini Implantes",
+       "like": 137,
+       "comentario": 18,
+       "repost": 8,
+       "envio": 14,
+       "salvamento": 3,
+       "views": 6563,
+       "seguidores": 1
+      },
+      {
+       "video": "Tour SIN",
+       "like": 135,
+       "comentario": 9,
+       "repost": 17,
+       "envio": 34,
+       "salvamento": 10,
+       "views": 6266,
+       "seguidores": 4
+      },
+      {
+       "video": "Odontologia enfoque principal - Thiago",
+       "like": 50,
+       "comentario": 8,
+       "repost": 10,
+       "envio": 9,
+       "salvamento": 2,
+       "views": 6643,
+       "seguidores": 1
+      },
+      {
+       "video": "Depoimento Geraldine - Orto",
+       "like": 139,
+       "comentario": 38,
+       "repost": 13,
+       "envio": 44,
+       "salvamento": 5,
+       "views": 18000,
+       "seguidores": 6
+      },
+      {
+       "video": "Tecnica - John Exocad",
+       "like": 62,
+       "comentario": 5,
+       "repost": 5,
+       "envio": 2,
+       "salvamento": 9,
+       "views": 4435,
+       "seguidores": 2
+      },
+      {
+       "video": "Playlist UniCPO",
+       "like": 157,
+       "comentario": 17,
+       "repost": 11,
+       "envio": 30,
+       "salvamento": 11,
+       "views": 9894,
+       "seguidores": 2
+      },
+      {
+       "video": "Depoimento - Dra. Nicole - Orto",
+       "like": 41,
+       "comentario": 7,
+       "repost": 3,
+       "envio": 9,
+       "salvamento": 2,
+       "views": 3612,
+       "seguidores": 0
+      },
+      {
+       "video": "Tour virtual",
+       "like": 44,
+       "comentario": 10,
+       "repost": 9,
+       "envio": 7,
+       "salvamento": 7,
+       "views": 3981,
+       "seguidores": 0
+      },
+      {
+       "video": "O que UniCPO significa para você",
+       "like": 159,
+       "comentario": 63,
+       "repost": 20,
+       "envio": 12,
+       "salvamento": 7,
+       "views": 9710,
+       "seguidores": 2
+      },
+      {
+       "video": "Ping Pong - Dentistica",
+       "like": 152,
+       "comentario": 12,
+       "repost": 12,
+       "envio": 19,
+       "salvamento": 7,
+       "views": 6704,
+       "seguidores": 1
+      },
+      {
+       "video": "Tecnico - Ludmila",
+       "like": 97,
+       "comentario": 9,
+       "repost": 5,
+       "envio": 9,
+       "salvamento": 7,
+       "views": 5479,
+       "seguidores": 0
+      },
+      {
+       "video": "Formatura AOF e DENTISTICA",
+       "like": 171,
+       "comentario": 11,
+       "repost": 9,
+       "envio": 17,
+       "salvamento": 17,
+       "views": 114574,
+       "seguidores": 20
+      },
+      {
+       "video": "Tecnico - Augusto - Rinomodelacion",
+       "like": 4298,
+       "comentario": 123,
+       "repost": 128,
+       "envio": 2529,
+       "salvamento": 4300,
+       "views": 700000,
+       "seguidores": 1943
+      },
+      {
+       "video": "Assinatura na Tela - Formatura",
+       "like": 246,
+       "comentario": 13,
+       "repost": 16,
+       "envio": 14,
+       "salvamento": 8,
+       "views": 16758,
+       "seguidores": 2
+      },
+      {
+       "video": "Porque escolhi UniCPO",
+       "like": 138,
+       "comentario": 12,
+       "repost": 2,
+       "envio": 12,
+       "salvamento": 5,
+       "views": 6457,
+       "seguidores": 5
+      },
+      {
+       "video": "Depoimento - Camila Cordero",
+       "like": 275,
+       "comentario": 69,
+       "repost": 8,
+       "envio": 20,
+       "salvamento": 8,
+       "views": 28412,
+       "seguidores": 5
+      },
+      {
+       "video": "Thiago - Una Noche muy Especial",
+       "like": 178,
+       "comentario": 15,
+       "repost": 13,
+       "envio": 10,
+       "salvamento": 5,
+       "views": 5752,
+       "seguidores": 5
+      },
+      {
+       "video": "Carrossel - Porto",
+       "like": 162,
+       "comentario": 21,
+       "repost": 5,
+       "envio": 6,
+       "salvamento": 6,
+       "views": 8700,
+       "seguidores": 2
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos",
+       "like": 74,
+       "comentario": 6,
+       "repost": 7,
+       "envio": 13,
+       "salvamento": 3,
+       "views": 19214,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (5/09)",
+       "like": 141,
+       "comentario": 12,
+       "repost": 9,
+       "envio": 14,
+       "salvamento": 4,
+       "views": 10862,
+       "seguidores": 3
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (07/09)",
+       "like": 58,
+       "comentario": 5,
+       "repost": 2,
+       "envio": 5,
+       "salvamento": 0,
+       "views": 12204,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (11/09)",
+       "like": 85,
+       "comentario": 7,
+       "repost": 2,
+       "envio": 6,
+       "salvamento": 1,
+       "views": 14005,
+       "seguidores": 1
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (12/09)",
+       "like": 139,
+       "comentario": 4,
+       "repost": 6,
+       "envio": 12,
+       "salvamento": 5,
+       "views": 22732,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (13/09)",
+       "like": 100,
+       "comentario": 10,
+       "repost": 4,
+       "envio": 10,
+       "salvamento": 3,
+       "views": 13137,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (17/09)",
+       "like": 91,
+       "comentario": 5,
+       "repost": 4,
+       "envio": 12,
+       "salvamento": 2,
+       "views": 15882,
+       "seguidores": 3
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (18/09)",
+       "like": 137,
+       "comentario": 3,
+       "repost": 0,
+       "envio": 17,
+       "salvamento": 3,
+       "views": 15786,
+       "seguidores": 1
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (19/09)",
+       "like": 96,
+       "comentario": 5,
+       "repost": 3,
+       "envio": 18,
+       "salvamento": 2,
+       "views": 15298,
+       "seguidores": 2
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (20/09)",
+       "like": 329,
+       "comentario": 7,
+       "repost": 1,
+       "envio": 14,
+       "salvamento": 16,
+       "views": 43238,
+       "seguidores": 1
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (24/09)",
+       "like": 151,
+       "comentario": 5,
+       "repost": 6,
+       "envio": 20,
+       "salvamento": 4,
+       "views": 22076,
+       "seguidores": 3
+      },
+      {
+       "video": "Carrossel - Fotos Bandeiras",
+       "like": 54,
+       "comentario": 3,
+       "repost": 1,
+       "envio": 10,
+       "salvamento": 4,
+       "views": 8127,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (26/09)",
+       "like": 50,
+       "comentario": 5,
+       "repost": 2,
+       "envio": 1,
+       "salvamento": 3,
+       "views": 9628,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (27/09)",
+       "like": 160,
+       "comentario": 5,
+       "repost": 4,
+       "envio": 3,
+       "salvamento": 6,
+       "views": 27767,
+       "seguidores": 0
+      },
+      {
+       "video": "Carrossel - Fotos - Alunos (31/09)",
+       "like": 113,
+       "comentario": 5,
+       "repost": 0,
+       "envio": 11,
+       "salvamento": 6,
+       "views": 16893,
+       "seguidores": 0
+      }
+     ]
+    },
+    "2026-09": {
+     "label": "Setembro 2026",
+     "createdAt": 1788700000000,
+     "posts": [
+      {
+       "video": "Carrossel - Bandeiras - 01-09",
+       "like": 120,
+       "comentario": 7,
+       "repost": 1,
+       "envio": 14,
+       "salvamento": 3,
+       "views": 16440,
+       "seguidores": 4
+      },
+      {
+       "video": "[Depoimento] - Genny flores",
+       "like": 69,
+       "comentario": 9,
+       "repost": 1,
+       "envio": 6,
+       "salvamento": 8,
+       "views": 197517,
+       "seguidores": 17
+      },
+      {
+       "video": "Carrossel - Clinica - 02-09",
+       "like": 61,
+       "comentario": 3,
+       "repost": 0,
+       "envio": 30,
+       "salvamento": 1,
+       "views": 7873,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Lorena - Colombia",
+       "like": 24,
+       "comentario": 5,
+       "repost": 1,
+       "envio": 1,
+       "salvamento": 1,
+       "views": 3584,
+       "seguidores": 0
+      },
+      {
+       "video": "[Convite] - Quito",
+       "like": 84,
+       "comentario": 10,
+       "repost": 9,
+       "envio": 23,
+       "salvamento": 5,
+       "views": 12576,
+       "seguidores": 0
+      },
+      {
+       "video": "[CARROSSEL] - Fotos formatura",
+       "like": 152,
+       "comentario": 10,
+       "repost": 8,
+       "envio": 35,
+       "salvamento": 4,
+       "views": 20931,
+       "seguidores": 0
+      },
+      {
+       "video": "[Tecnico] - Placa Base - Dr. Porto",
+       "like": 182,
+       "comentario": 9,
+       "repost": 10,
+       "envio": 46,
+       "salvamento": 34,
+       "views": 7429,
+       "seguidores": 11
+      },
+      {
+       "video": "[Carrossel] - Alunos 08-09",
+       "like": 195,
+       "comentario": 4,
+       "repost": 1,
+       "envio": 10,
+       "salvamento": 5,
+       "views": 35843,
+       "seguidores": 2
+      },
+      {
+       "video": "[Convite] - Expo Dental",
+       "like": 127,
+       "comentario": 14,
+       "repost": 12,
+       "envio": 18,
+       "salvamento": 1,
+       "views": 9276,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Juan Pablo 1",
+       "like": 203,
+       "comentario": 43,
+       "repost": 43,
+       "envio": 29,
+       "salvamento": 18,
+       "views": 37056,
+       "seguidores": 13
+      },
+      {
+       "video": "[Depoimento] - Si se puede",
+       "like": 92,
+       "comentario": 18,
+       "repost": 3,
+       "envio": 6,
+       "salvamento": 9,
+       "views": 4091,
+       "seguidores": 5
+      },
+      {
+       "video": "[Carrossel] - Clinica - 11-09",
+       "like": 97,
+       "comentario": 6,
+       "repost": 4,
+       "envio": 4,
+       "salvamento": 3,
+       "views": 14656,
+       "seguidores": 0
+      },
+      {
+       "video": "[Reels] - Expo Dental 2026",
+       "like": 133,
+       "comentario": 4,
+       "repost": 5,
+       "envio": 14,
+       "salvamento": 3,
+       "views": 68434,
+       "seguidores": 6
+      },
+      {
+       "video": "[Thiago] - Expo Dental dia 1",
+       "like": 193,
+       "comentario": 12,
+       "repost": 10,
+       "envio": 8,
+       "salvamento": 4,
+       "views": 6479,
+       "seguidores": 0
+      },
+      {
+       "video": "[Carrossel] - Fotos Expo Dental",
+       "like": 265,
+       "comentario": 6,
+       "repost": 2,
+       "envio": 17,
+       "salvamento": 7,
+       "views": 18799,
+       "seguidores": 0
+      },
+      {
+       "video": "[Thiago] - Expo Dental dia 2",
+       "like": 118,
+       "comentario": 5,
+       "repost": 6,
+       "envio": 7,
+       "salvamento": 2,
+       "views": 4130,
+       "seguidores": 0
+      },
+      {
+       "video": "[Thiago] - Expo Dental dia 3",
+       "like": 93,
+       "comentario": 6,
+       "repost": 8,
+       "envio": 5,
+       "salvamento": 3,
+       "views": 4661,
+       "seguidores": 0
+      },
+      {
+       "video": "[Carrossel] - Lab - 14-09",
+       "like": 65,
+       "comentario": 3,
+       "repost": 2,
+       "envio": 7,
+       "salvamento": 3,
+       "views": 15195,
+       "seguidores": 0
+      },
+      {
+       "video": "[Thiago] - Pratica clinica",
+       "like": 73,
+       "comentario": 6,
+       "repost": 8,
+       "envio": 10,
+       "salvamento": 3,
+       "views": 4925,
+       "seguidores": 2
+      },
+      {
+       "video": "[Tecnico] - Alargamento de Corona - Dra. Andreia",
+       "like": 2000,
+       "comentario": 21,
+       "repost": 39,
+       "envio": 453,
+       "salvamento": 814,
+       "views": 84844,
+       "seguidores": 107
+      },
+      {
+       "video": "[Carrossel] - Bandeiras - Endo",
+       "like": 130,
+       "comentario": 9,
+       "repost": 5,
+       "envio": 19,
+       "salvamento": 5,
+       "views": 15007,
+       "seguidores": 5
+      },
+      {
+       "video": "[Criativo] - Blefaro - Gustavo",
+       "like": 94,
+       "comentario": 27,
+       "repost": 3,
+       "envio": 17,
+       "salvamento": 6,
+       "views": 13110,
+       "seguidores": 5
+      },
+      {
+       "video": "[Carrossel] - OdontoP",
+       "like": 232,
+       "comentario": 8,
+       "repost": 4,
+       "envio": 7,
+       "salvamento": 14,
+       "views": 27970,
+       "seguidores": 2
+      },
+      {
+       "video": "[Carrossel] - TBT Expo Dental",
+       "like": 189,
+       "comentario": 5,
+       "repost": 3,
+       "envio": 13,
+       "salvamento": 3,
+       "views": 30165,
+       "seguidores": 2
+      },
+      {
+       "video": "[Carrossel] - Clinica - 18-09",
+       "like": 56,
+       "comentario": 5,
+       "repost": 0,
+       "envio": 1,
+       "salvamento": 2,
+       "views": 7111,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Eva",
+       "like": 37,
+       "comentario": 13,
+       "repost": 9,
+       "envio": 18,
+       "salvamento": 7,
+       "views": 3497,
+       "seguidores": 2
+      },
+      {
+       "video": "[Queez] - Alunos AOF",
+       "like": 55,
+       "comentario": 8,
+       "repost": 1,
+       "envio": 2,
+       "salvamento": 3,
+       "views": 4260,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Nancy Lucas",
+       "like": 84,
+       "comentario": 8,
+       "repost": 8,
+       "envio": 2,
+       "salvamento": 4,
+       "views": 6408,
+       "seguidores": 0
+      },
+      {
+       "video": "[Carrossel] - Clinica 22-09",
+       "like": 71,
+       "comentario": 4,
+       "repost": 1,
+       "envio": 2,
+       "salvamento": 2,
+       "views": 10955,
+       "seguidores": 1
+      },
+      {
+       "video": "[Tecnico] - encerrado digital - Henrique",
+       "like": 70,
+       "comentario": 12,
+       "repost": 3,
+       "envio": 13,
+       "salvamento": 14,
+       "views": 2826,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Protesis sobre Implantes",
+       "like": 46,
+       "comentario": 9,
+       "repost": 5,
+       "envio": 5,
+       "salvamento": 3,
+       "views": 3039,
+       "seguidores": 0
+      },
+      {
+       "video": "[Tecnico] - Toxina Botulinica - Dr.Augusto",
+       "like": 549,
+       "comentario": 13,
+       "repost": 18,
+       "envio": 222,
+       "salvamento": 470,
+       "views": 134283,
+       "seguidores": 153
+      },
+      {
+       "video": "[Convite] - UniCPO em Lima",
+       "like": 71,
+       "comentario": 26,
+       "repost": 6,
+       "envio": 9,
+       "salvamento": 4,
+       "views": 6343,
+       "seguidores": 1
+      },
+      {
+       "video": "[Depoimento] - Formatura Orto - Marcelo",
+       "like": 260,
+       "comentario": 12,
+       "repost": 8,
+       "envio": 32,
+       "salvamento": 12,
+       "views": 9173,
+       "seguidores": 0
+      },
+      {
+       "video": "[Carrossel] - Dia a Dia 25-09",
+       "like": 365,
+       "comentario": 9,
+       "repost": 3,
+       "envio": 13,
+       "salvamento": 11,
+       "views": 40000,
+       "seguidores": 1
+      },
+      {
+       "video": "[Criativo] - Blefaro - Augusto",
+       "like": 62,
+       "comentario": 11,
+       "repost": 6,
+       "envio": 7,
+       "salvamento": 4,
+       "views": 50571,
+       "seguidores": 5
+      },
+      {
+       "video": "[Thiago] - Lima - corte da palestra",
+       "like": 99,
+       "comentario": 16,
+       "repost": 11,
+       "envio": 6,
+       "salvamento": 3,
+       "views": 3777,
+       "seguidores": 0
+      },
+      {
+       "video": "[Reels] - SOLA LIMA 2026",
+       "like": 58,
+       "comentario": 8,
+       "repost": 8,
+       "envio": 10,
+       "salvamento": 4,
+       "views": 5158,
+       "seguidores": 1
+      },
+      {
+       "video": "[Carrossel] - Clinica 29-09",
+       "like": 80,
+       "comentario": 6,
+       "repost": 3,
+       "envio": 2,
+       "salvamento": 3,
+       "views": 11727,
+       "seguidores": 0
+      },
+      {
+       "video": "[Depoimento] - Formatura AOF e Dent",
+       "like": 85,
+       "comentario": 7,
+       "repost": 4,
+       "envio": 5,
+       "salvamento": 6,
+       "views": 13873,
+       "seguidores": 2
+      },
+      {
+       "video": "[Convite] - ORTO SPO 26",
+       "like": 106,
+       "comentario": 6,
+       "repost": 6,
+       "envio": 8,
+       "salvamento": 4,
+       "views": 10416,
+       "seguidores": 1
+      },
+      {
+       "video": "[Carrossel] - Fotos gravação spoiler",
+       "like": 152,
+       "comentario": 39,
+       "repost": 13,
+       "envio": 47,
+       "salvamento": 3,
+       "views": 12446,
+       "seguidores": 0
+      }
+     ]
+    }
+   }
+  },
+  "fainter": {
+   "months": {
+    "2026-09": {
+     "label": "Setembro 2026",
+     "createdAt": 1788700000000,
+     "posts": [
+      {
+       "video": "[Carrossel] - Clinica - Estomatologia",
+       "like": 101,
+       "comentario": 6,
+       "repost": 1,
+       "envio": 3,
+       "salvamento": 1,
+       "views": 4223,
+       "seguidores": 1
+      },
+      {
+       "video": "[Reels] - Atividades praticas - Mariel",
+       "like": 54,
+       "comentario": 7,
+       "repost": 4,
+       "envio": 3,
+       "salvamento": 2,
+       "views": 1568,
+       "seguidores": 0
+      },
+      {
+       "video": "[Carrossel] - Fotos spoiler video (Dia do dentista]",
+       "like": 152,
+       "comentario": 39,
+       "repost": 13,
+       "envio": 47,
+       "salvamento": 3,
+       "views": 12462,
+       "seguidores": 0
+      }
+     ]
+    }
+   }
+  },
+  "clinica": {
+   "months": {
+    "2026-09": {
+     "label": "Setembro 2026",
+     "createdAt": 1788700000000,
+     "posts": [
+      {
+       "video": "3 Sinais tratamento de Canal",
+       "like": 72,
+       "comentario": 10,
+       "repost": 5,
+       "envio": 2,
+       "salvamento": 5,
+       "views": 1773,
+       "seguidores": 0
+      },
+      {
+       "video": "Você passa o Fio Dental",
+       "like": 46,
+       "comentario": 8,
+       "repost": 6,
+       "envio": 4,
+       "salvamento": 3,
+       "views": 1786,
+       "seguidores": 3
+      },
+      {
+       "video": "Invisalign Clinica UniCPO",
+       "like": 70,
+       "comentario": 8,
+       "repost": 9,
+       "envio": 23,
+       "salvamento": 6,
+       "views": 62097,
+       "seguidores": 18
+      },
+      {
+       "video": "Criativo - (Feridas, manchas...)",
+       "like": 15,
+       "comentario": 0,
+       "repost": 1,
+       "envio": 15,
+       "salvamento": 0,
+       "views": 4614,
+       "seguidores": 0
+      },
+      {
+       "video": "Reels - Protese sobre Implante",
+       "like": 11,
+       "comentario": 2,
+       "repost": 1,
+       "envio": 0,
+       "salvamento": 1,
+       "views": 647,
+       "seguidores": 0
+      },
+      {
+       "video": "Reels - Mordida aberta",
+       "like": 48,
+       "comentario": 4,
+       "repost": 2,
+       "envio": 94,
+       "salvamento": 2,
+       "views": 1202,
+       "seguidores": 1
+      }
+     ]
+    }
+   }
+  }
+ }
+}

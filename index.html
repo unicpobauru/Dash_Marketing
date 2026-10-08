@@ -47,6 +47,8 @@
   .tab .del{margin-left:8px;opacity:.55;font-weight:700}
   .tab .del:hover{opacity:1;color:var(--gold-soft)}
   .tab.add{color:var(--gold-soft)}
+  .tab.exp{margin-left:auto;color:var(--gold-soft);font-size:12.5px}
+  .lpill{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:middle}
 
   main{padding:26px 0 60px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
@@ -230,7 +232,7 @@
 
 <footer>
   <img id="ftLogo" src="logo-unicpo.png" alt="UniCPO" />
-  Ranking de Posts — os dados ficam salvos apenas neste navegador. A cada mês, suba o novo PDF pela aba correspondente.
+  Ranking de Posts — os meses publicados aparecem para todos. Meses subidos aqui ficam só neste navegador (etiqueta “local”) até serem publicados.
 </footer>
 
 <script>
@@ -247,52 +249,6 @@ const BRANDS = {
   clinica: {name:"Clínica UniCPO", logo:"logo-unicpo.png", tag:"Clínica"}
 };
 
-/* ---------- seed: dados do PDF de Agosto/2026 ---------- */
-const SEED = {"2026-08":{label:"Agosto 2026",createdAt:Date.now(),posts:[
-["Aniversário de Bauru",190,11,15,25,7,9513,0],
-["Dr. Porto - Historia",64,8,5,3,2,4187,0],
-["Dr. Patrick - Tecnico - Sutura",240,38,10,48,91,95953,38],
-["PodCast - Thiago e John",219,13,18,14,11,8918,11],
-["UniCPO: Estrutura com aluna",130,8,10,5,3,9641,1],
-["Assinatura na Tela - Protesis",232,17,20,45,14,16288,4],
-["Dia dos Pais - Depoimento",84,12,9,9,4,4664,0],
-["Curso Radiologia",61,9,4,6,1,4217,0],
-["Tirando foto da estrutura - Trend",143,7,8,16,6,11167,0],
-["Depoimento Cindy - Mini Implantes",137,18,8,14,3,6563,1],
-["Tour SIN",135,9,17,34,10,6266,4],
-["Odontologia enfoque principal - Thiago",50,8,10,9,2,6643,1],
-["Depoimento Geraldine - Orto",139,38,13,44,5,18000,6],
-["Tecnica - John Exocad",62,5,5,2,9,4435,2],
-["Playlist UniCPO",157,17,11,30,11,9894,2],
-["Depoimento - Dra. Nicole - Orto",41,7,3,9,2,3612,0],
-["Tour virtual",44,10,9,7,7,3981,0],
-["O que UniCPO significa para você",159,63,20,12,7,9710,2],
-["Ping Pong - Dentistica",152,12,12,19,7,6704,1],
-["Tecnico - Ludmila",97,9,5,9,7,5479,0],
-["Formatura AOF e DENTISTICA",171,11,9,17,17,114574,20],
-["Tecnico - Augusto - Rinomodelacion",4298,123,128,2529,4300,700000,1943],
-["Assinatura na Tela - Formatura",246,13,16,14,8,16758,2],
-["Porque escolhi UniCPO",138,12,2,12,5,6457,5],
-["Depoimento - Camila Cordero",275,69,8,20,8,28412,5],
-["Thiago - Una Noche muy Especial",178,15,13,10,5,5752,5],
-["Carrossel - Porto",162,21,5,6,6,8700,2],
-["Carrossel - Fotos - Alunos",74,6,7,13,3,19214,0],
-["Carrossel - Fotos - Alunos (5/09)",141,12,9,14,4,10862,3],
-["Carrossel - Fotos - Alunos (07/09)",58,5,2,5,0,12204,0],
-["Carrossel - Fotos - Alunos (11/09)",85,7,2,6,1,14005,1],
-["Carrossel - Fotos - Alunos (12/09)",139,4,6,12,5,22732,0],
-["Carrossel - Fotos - Alunos (13/09)",100,10,4,10,3,13137,0],
-["Carrossel - Fotos - Alunos (17/09)",91,5,4,12,2,15882,3],
-["Carrossel - Fotos - Alunos (18/09)",137,3,0,17,3,15786,1],
-["Carrossel - Fotos - Alunos (19/09)",96,5,3,18,2,15298,2],
-["Carrossel - Fotos - Alunos (20/09)",329,7,1,14,16,43238,1],
-["Carrossel - Fotos - Alunos (24/09)",151,5,6,20,4,22076,3],
-["Carrossel - Fotos Bandeiras",54,3,1,10,4,8127,0],
-["Carrossel - Fotos - Alunos (26/09)",50,5,2,1,3,9628,0],
-["Carrossel - Fotos - Alunos (27/09)",160,5,4,3,6,27767,0],
-["Carrossel - Fotos - Alunos (31/09)",113,5,0,11,6,16893,0]
-].map(r=>({video:r[0],like:r[1],comentario:r[2],repost:r[3],envio:r[4],salvamento:r[5],views:r[6],seguidores:r[7]}))}};
-
 /* ---------- store ---------- */
 function loadAll(){
   const empty = ()=>({brands:Object.fromEntries(Object.keys(BRANDS).map(k=>[k,{months:{}}]))});
@@ -305,7 +261,7 @@ function loadAll(){
     }
     const s = empty();
     const old = localStorage.getItem(OLD_KEY);
-    s.brands.unicpo.months = old ? (JSON.parse(old).months||{}) : SEED;
+    s.brands.unicpo.months = old ? (JSON.parse(old).months||{}) : {};
     localStorage.setItem(STORE_KEY,JSON.stringify(s));
     return s;
   }catch(e){ return empty(); }
@@ -313,7 +269,25 @@ function loadAll(){
 let data = loadAll();
 let brand = localStorage.getItem(BRAND_KEY);
 if(!BRANDS[brand]) brand = "unicpo";
-const store = { get months(){ return data.brands[brand].months; } };
+/* dados publicados (dados.json no repositório) — visíveis para qualquer pessoa que abrir o link */
+let shared = {brands:{}};
+function sharedMonths(b){ return ((shared.brands||{})[b]||{}).months||{}; }
+async function loadShared(){
+  try{
+    const r = await fetch("dados.json?cb="+Date.now(),{cache:"no-store"});
+    if(r.ok){ const j = await r.json(); if(j && j.brands) shared = j; }
+  }catch(e){ console.warn("dados.json indisponível",e); }
+  let changed = false;   // descarta cópias locais idênticas às publicadas
+  Object.keys(BRANDS).forEach(b=>{
+    const sm = sharedMonths(b), lm = data.brands[b].months;
+    Object.keys(lm).forEach(k=>{ if(sm[k] && JSON.stringify(sm[k].posts)===JSON.stringify(lm[k].posts)){ delete lm[k]; changed = true; } });
+  });
+  if(changed) save();
+}
+/* meses publicados + meses subidos neste navegador (o local vence) */
+const store = { get months(){ return Object.assign({}, sharedMonths(brand), data.brands[brand].months); } };
+function isLocal(k){ return k in data.brands[brand].months; }
+function isPublished(k){ return k in sharedMonths(brand); }
 function save(){ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }
 function activeKeyFor(b){ return ACTIVE_KEY+"_"+b; }
 let active = localStorage.getItem(activeKeyFor(brand)) || (brand==="unicpo" ? localStorage.getItem(ACTIVE_KEY) : null);
@@ -411,11 +385,13 @@ function renderTabs(){
   keys.forEach(k=>{
     const b = document.createElement("button");
     b.className = "tab" + (k===active?" active":"");
-    b.innerHTML = `${store.months[k].label} <span class="del" title="Remover mês">✕</span>`;
+    b.innerHTML = `${store.months[k].label}${isLocal(k)?' <span class="lpill" title="Salvo só neste navegador — exporte e publique para todos verem">local</span>':''} <span class="del" title="Remover mês">✕</span>`;
     b.onclick = e=>{
       if(e.target.classList.contains("del")){
-        if(confirm(`Remover "${store.months[k].label}" do ranking?`)){
-          delete store.months[k]; save(store);
+        if(!isLocal(k)){
+          alert("Este mês está publicado para todos (arquivo dados.json no GitHub). Para removê-lo, edite ou peça a remoção no dados.json.");
+        } else if(confirm(isPublished(k) ? `Descartar a versão local de "${store.months[k].label}"? Volta a valer a versão publicada.` : `Remover "${store.months[k].label}" deste navegador?`)){
+          delete data.brands[brand].months[k]; save();
           if(active===k) active=null;
           renderTabs(); renderView();
         }
@@ -430,6 +406,20 @@ function renderTabs(){
   add.textContent = "＋ Adicionar mês";
   add.onclick = ()=>openModal();
   el.appendChild(add);
+  const exp = document.createElement("button");
+  exp.className = "tab exp";
+  exp.textContent = "⬇ Exportar dados";
+  exp.title = "Baixa o dados.json com todos os meses (publicados + locais)";
+  exp.onclick = exportAll;
+  el.appendChild(exp);
+}
+function exportAll(){
+  const out = {version:1, brands:{}};
+  Object.keys(BRANDS).forEach(b=>{ out.brands[b] = {months: Object.assign({}, sharedMonths(b), data.brands[b].months)}; });
+  const blob = new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "dados.json"; a.click();
+  alert("dados.json baixado." + String.fromCharCode(10,10) + "Para todos verem: no GitHub (repositório Dash_Marketing) abra dados.json, edite/envie este arquivo e confirme. Ou envie o arquivo para o Claude publicar.");
 }
 
 function renderView(){
@@ -633,12 +623,12 @@ document.getElementById("mSave").onclick = async ()=>{
   }
   if(!posts.length){ msg("Nenhuma linha de post reconhecida. Verifique o arquivo ou cole os dados manualmente.","err"); return; }
 
-  store.months[key] = { label, createdAt: Date.now(), posts };
+  data.brands[brand].months[key] = { label, createdAt: Date.now(), posts };
   save(store);
   active = key; localStorage.setItem(activeKeyFor(brand),key);
-  msg(`${posts.length} posts carregados.`,"ok");
+  msg(`${posts.length} posts carregados. Salvo só neste navegador: para todos verem, use "Exportar dados" e publique.`,"ok");
   renderTabs();
-  setTimeout(()=>{ closeModal(); renderView(); }, 500);
+  setTimeout(()=>{ closeModal(); renderView(); }, 2600);
 };
 
 /* ---------- marca (UniCPO / FAINTER) ---------- */
@@ -661,9 +651,7 @@ function setBrand(k){
 }
 
 /* ---------- init ---------- */
-renderBrand();
-renderTabs();
-renderView();
+(async()=>{ await loadShared(); renderBrand(); renderTabs(); renderView(); })();
 </script>
 </body>
 </html>

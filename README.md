@@ -1,7 +1,7 @@
 # Dash Marketing — Ranking de Posts UniCPO
 
 Página estática (um único `index.html`) que gera um **ranking de posts** a partir do
-relatório mensal em PDF. Roda 100% no navegador — nada é enviado para servidor.
+relatório mensal em PDF. O cálculo roda no navegador; os dados publicados vêm do `dados.json`.
 
 ## Funcionamento
 
@@ -11,8 +11,10 @@ relatório mensal em PDF. Roda 100% no navegador — nada é enviado para servid
   mês/ano e envia o PDF. O site lê a tabela `Vídeo | Like | Comentário | Repost | Envio |
   Salvamento | Visualizações | Seguidores`, calcula o score e monta o ranking.
   Se a leitura automática falhar, há um campo para colar os dados (TAB, vírgula ou 2+ espaços).
-- **Persistência.** Os meses ficam salvos no `localStorage` do navegador. Todo mês é só
-  abrir a página e subir o PDF novo.
+- **Dados compartilhados.** Os meses publicados ficam no arquivo `dados.json` do repositório e
+  aparecem para **qualquer pessoa** que abrir o link. Meses subidos pelo navegador ficam só ali
+  (etiqueta "local") até serem publicados: clique em **Exportar dados** e substitua o `dados.json`
+  no GitHub (ou peça para publicarem).
 - **Exportar CSV** do ranking do mês.
 
 ## Metodologia do score (0–100)
