@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
     --navy:#0a2a52; --navy-2:#0d3a6b; --blue:#1f6fc4; --blue-soft:#4f9ae0;
@@ -155,6 +156,81 @@
     .brand .logo{height:38px}
     .switch{margin-left:0}
   }
+
+  /* ===== v3: pódio, insights, gráficos ===== */
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  #view > *{animation:rise .45s ease both}
+  .sec{display:flex;align-items:baseline;gap:12px;margin:30px 2px 14px}
+  .sec h2{font-size:19px;color:var(--navy);white-space:nowrap}
+  .sec .sub{color:var(--muted);font-size:12.5px}
+  .sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent);align-self:center;order:3}
+
+  .dlt{font-size:11.5px;font-weight:700;margin-top:4px}
+  .dlt span{font-weight:500;color:var(--muted)}
+  .dlt.dpos{color:#17794a} .dlt.dneg{color:#b0342e}
+  .kpi .lbl small{text-transform:none;letter-spacing:0;font-weight:500}
+
+  .podium2{display:grid;grid-template-columns:1fr 1.16fr 1fr;gap:18px;align-items:end}
+  .pod2{padding:18px 18px 16px;position:relative;overflow:hidden;border-top:5px solid var(--mc,var(--gold))}
+  .pod2.p1{--mc:var(--gold);order:2;background:linear-gradient(180deg,#fdf5e3,#fff 55%);box-shadow:0 0 0 1px var(--gold-soft),0 18px 44px rgba(201,162,75,.28)}
+  .pod2.p2{--mc:#9fb0c2;order:1;background:linear-gradient(180deg,#f3f6fa,#fff 55%)}
+  .pod2.p3{--mc:#c58b4d;order:3;background:linear-gradient(180deg,#fbf3ec,#fff 55%)}
+  .phead{display:flex;align-items:center;justify-content:space-between}
+  .medal2{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:Poppins;font-weight:800;color:#fff;font-size:16px;background:var(--mc);box-shadow:0 4px 12px rgba(16,40,80,.22)}
+  .pod2.p1 .medal2{background:linear-gradient(135deg,var(--gold),var(--gold-dark));width:50px;height:50px;font-size:19px}
+  .ptag{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;background:var(--mc);padding:4px 10px;border-radius:999px}
+  .pod2.p1 .ptag{background:linear-gradient(135deg,var(--gold),var(--gold-dark))}
+  .pname{font-weight:700;font-size:15px;margin:12px 0 2px;line-height:1.3;min-height:40px}
+  .pscore{font-family:Poppins;font-weight:800;font-size:34px;color:var(--navy);line-height:1.1}
+  .pod2.p1 .pscore{font-size:42px}
+  .pscore span{font-size:14px;color:var(--muted);font-weight:600}
+  .pod2 .mini{margin:8px 0 10px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .chip{font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+  .chip b{color:var(--navy);font-family:Poppins}
+  .chip.mute{background:#f6f8fc}
+  .vbox{border-radius:12px;overflow:hidden;background:#0d1b30;border:1px solid var(--line)}
+  .vbox iframe,.vbox video{width:100%;height:100%;border:0;display:block}
+  .vbox.tall{height:430px} .pod2.p1 .vbox.tall{height:500px}
+  .vbox.wide{aspect-ratio:16/9}
+  .vph{border:2px dashed var(--line);border-radius:12px;background:#fbfcfe;padding:20px 14px;text-align:center;color:var(--muted);min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  .vph .play{width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:18px;padding-left:3px}
+  .vph .vtxt{font-size:13px;font-weight:600}
+  .vph form{display:flex;gap:6px;width:100%;margin-top:4px}
+  .vph input{flex:1;min-width:0;font:inherit;font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:9px}
+  .vph .btn{padding:8px 12px;font-size:12.5px}
+  .vact{display:flex;gap:8px;margin-top:8px}
+  .vact button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;padding:2px 4px}
+  .vact button:hover{color:var(--blue);text-decoration:underline}
+
+  .insights{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px}
+  .ins{display:flex;gap:12px;padding:14px 16px;border-left:4px solid var(--c,var(--blue));transition:transform .15s,box-shadow .15s}
+  .ins:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(16,40,80,.08),0 14px 30px rgba(16,40,80,.12)}
+  .ins .ic{flex:none;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:color-mix(in srgb,var(--c) 14%,#fff)}
+  .ins .ib{min-width:0}
+  .ins .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700}
+  .ins .ttl{font-weight:700;font-size:13.5px;margin:4px 0 2px;line-height:1.3}
+  .ins .val{font-family:Poppins;font-weight:800;font-size:18px;color:var(--navy)}
+  .bds{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#e8f0fc;color:#1b4f8a}
+  .badge.ok{background:#e6f6ec;color:#17794a} .badge.warn{background:#fff1d9;color:#935c00} .badge.bad{background:#fdecec;color:#a52a2a} .badge.gold{background:#fbf0d4;color:#8a6410}
+
+  .charts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .chartcard{padding:16px 18px 14px}
+  .chartcard h3{font-size:14.5px;color:var(--navy)}
+  .chartcard .hint{font-size:12px;color:var(--muted);margin:2px 0 10px}
+  .cv{position:relative;height:310px}
+  .cv.short{height:260px}
+  .span2{grid-column:1/-1}
+  .evo-note{font-size:13px;color:var(--muted);padding:6px 2px}
+
+  @media(max-width:900px){
+    .podium2{grid-template-columns:1fr}
+    .pod2.p1{order:1}.pod2.p2{order:2}.pod2.p3{order:3}
+    .charts{grid-template-columns:1fr}
+    .vbox.tall,.pod2.p1 .vbox.tall{height:440px}
+    .sec{flex-wrap:wrap}
+  }
 </style>
 </head>
 <body>
@@ -251,11 +327,11 @@ const BRANDS = {
 
 /* ---------- store ---------- */
 function loadAll(){
-  const empty = ()=>({brands:Object.fromEntries(Object.keys(BRANDS).map(k=>[k,{months:{}}]))});
+  const empty = ()=>({links:{},brands:Object.fromEntries(Object.keys(BRANDS).map(k=>[k,{months:{}}]))});
   try{
     const raw = localStorage.getItem(STORE_KEY);
     if(raw){
-      const s = JSON.parse(raw); s.brands = s.brands||{};
+      const s = JSON.parse(raw); s.brands = s.brands||{}; s.links = s.links||{};
       Object.keys(BRANDS).forEach(b=>{ s.brands[b] = s.brands[b]||{months:{}}; s.brands[b].months = s.brands[b].months||{}; });
       return s;
     }
@@ -282,6 +358,8 @@ async function loadShared(){
     const sm = sharedMonths(b), lm = data.brands[b].months;
     Object.keys(lm).forEach(k=>{ if(sm[k] && JSON.stringify(sm[k].posts)===JSON.stringify(lm[k].posts)){ delete lm[k]; changed = true; } });
   });
+  data.links = data.links||{};
+  Object.keys(data.links).forEach(k=>{ if((shared.links||{})[k]===data.links[k]){ delete data.links[k]; changed = true; } });
   if(changed) save();
 }
 /* meses publicados + meses subidos neste navegador (o local vence) */
@@ -414,7 +492,7 @@ function renderTabs(){
   el.appendChild(exp);
 }
 function exportAll(){
-  const out = {version:1, brands:{}};
+  const out = {version:1, links:Object.fromEntries(Object.entries(Object.assign({}, shared.links, data.links)).filter(([,v])=>v)), brands:{}};
   Object.keys(BRANDS).forEach(b=>{ out.brands[b] = {months: Object.assign({}, sharedMonths(b), data.brands[b].months)}; });
   const blob = new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
   const a = document.createElement("a");
@@ -422,10 +500,51 @@ function exportAll(){
   alert("dados.json baixado." + String.fromCharCode(10,10) + "Para todos verem: no GitHub (repositório Dash_Marketing) abra dados.json, edite/envie este arquivo e confirme. Ou envie o arquivo para o Claude publicar.");
 }
 
+/* ---------- helpers de análise ---------- */
+let filterTerm = "";
+let charts = [];
+let curView = null;   // {key, m, data, keys, prev}
+
+function median(a){ const s=[...a].sort((x,y)=>x-y), n=s.length; return n ? (n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2) : 0; }
+function category(name){
+  const t = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const map = [[/carrossel/,"Carrossel"],[/reels/,"Reels"],[/depoimento/,"Depoimento"],[/convite/,"Convite"],[/criativo/,"Criativo"],[/tecnic[oa]/,"Técnico"],[/thiago/,"Thiago"],[/tour/,"Tour"],[/podcast/,"Podcast"]];
+  for(const [rx,c] of map) if(rx.test(t)) return c;
+  return "Outros";
+}
+const shortName = (s,n=30) => { s = s.replace(/[\[\]]/g,""); return s.length>n ? s.slice(0,n-1)+"…" : s; };
+
+/* ---------- links dos vídeos (para o player do Top 3) ---------- */
+function linkKey(mk,video){ return brand+"|"+mk+"|"+video; }
+function getLink(mk,video){
+  const k = linkKey(mk,video), L = data.links||{};
+  if(k in L) return L[k];
+  return (shared.links||{})[k] || "";
+}
+function setLink(mk,video,url){ data.links = data.links||{}; data.links[linkKey(mk,video)] = url; save(); }
+function embedFor(url){
+  let u; try{ u = new URL(url); }catch(e){ return null; }
+  const h = u.hostname.replace(/^www\./,""); let m;
+  if(h.endsWith("instagram.com") && (m = u.pathname.match(/\/(p|reel|reels|tv)\/([\w-]+)/)))
+    return {kind:"ig", src:`https://www.instagram.com/${m[1]==="reels"?"reel":m[1]}/${m[2]}/embed/`};
+  if(h==="youtu.be" && u.pathname.length>1) return {kind:"yt", src:`https://www.youtube.com/embed/${u.pathname.slice(1)}`};
+  if(h.endsWith("youtube.com")){
+    const id = u.searchParams.get("v") || ((m = u.pathname.match(/\/(shorts|embed)\/([\w-]+)/)) ? m[2] : null);
+    if(id) return {kind:"yt", src:`https://www.youtube.com/embed/${id}`};
+  }
+  if(h.endsWith("tiktok.com") && (m = u.pathname.match(/\/video\/(\d+)/))) return {kind:"tt", src:`https://www.tiktok.com/embed/v2/${m[1]}`};
+  if(/\.(mp4|webm|mov)$/i.test(u.pathname)) return {kind:"file", src:url};
+  return {kind:"link", src:url};
+}
+
+/* ---------- tela principal ---------- */
 function renderView(){
+  charts.forEach(c=>c.destroy()); charts = [];
+  filterTerm = "";
   const view = document.getElementById("view");
   const key = active;
   if(!key || !store.months[key]){
+    curView = null;
     view.innerHTML = `
       <div class="card pad">
         <div class="up">
@@ -438,30 +557,48 @@ function renderView(){
   }
   const m = store.months[key];
   const data = scoreMonth(m.posts);
-  const totV = m.posts.reduce((a,p)=>a+(p.views||0),0);
-  const totF = m.posts.reduce((a,p)=>a+(p.seguidores||0),0);
-  const totE = m.posts.reduce((a,p)=>a+p.like+p.comentario+p.repost+p.envio+p.salvamento,0);
+  const keys = monthKeys();
+  const prevKey = keys[keys.indexOf(key)+1];
+  const prev = prevKey ? store.months[prevKey] : null;
+  curView = {key, m, data, keys, prev};
 
-  const podium = data.slice(0,3).map((o,i)=>`
-    <div class="card pod p${i+1}">
-      <div class="medal">${i+1}</div>
-      <div class="name">${esc(o.p.video)}</div>
-      <div class="score">${f1(o.score)}<span> / 100</span></div>
-      <div class="mini">${bar(o)}</div>
-    </div>`).join("");
-
-  const rows = applySort(data).map(o=>rowHTML(o)).join("");
+  const tot = ps => ({
+    n: ps.length,
+    f: ps.reduce((a,p)=>a+(p.seguidores||0),0),
+    v: ps.reduce((a,p)=>a+(p.views||0),0),
+    e: ps.reduce((a,p)=>a+p.like+p.comentario+p.repost+p.envio+p.salvamento,0)
+  });
+  const T = tot(m.posts), P = prev ? tot(prev.posts) : null;
+  const delta = (c,p) => {
+    if(!P || !p) return "";
+    const d = (c-p)/p*100, up = d>=0;
+    return `<div class="dlt ${up?"dpos":"dneg"}">${up?"▲":"▼"} ${fN(Math.abs(d),1)}% <span>vs ${esc(prev.label.split(" ")[0])}</span></div>`;
+  };
 
   view.innerHTML = `
     <div class="cards">
-      <div class="card kpi k1"><div class="lbl">Posts no mês</div><div class="val">${fmt(m.posts.length)}</div></div>
-      <div class="card kpi k2"><div class="lbl">Seguidores gerados</div><div class="val">${fmt(totF)}</div></div>
-      <div class="card kpi k3"><div class="lbl">Visualizações</div><div class="val">${fmt(totV)}</div></div>
-      <div class="card kpi k4"><div class="lbl">Interações</div><div class="val">${fmt(totE)}</div></div>
+      <div class="card kpi k1"><div class="lbl">Posts no mês</div><div class="val">${fmt(T.n)}</div>${delta(T.n,P&&P.n)}</div>
+      <div class="card kpi k2"><div class="lbl">Seguidores gerados</div><div class="val">${fmt(T.f)}</div>${delta(T.f,P&&P.f)}</div>
+      <div class="card kpi k3"><div class="lbl">Interações</div><div class="val">${fmt(T.e)}</div>${delta(T.e,P&&P.e)}</div>
+      <div class="card kpi k4"><div class="lbl">Visualizações <small>(inclui pago)</small></div><div class="val">${fmt(T.v)}</div>${delta(T.v,P&&P.v)}</div>
     </div>
 
-    <div class="podium">${podium}</div>
+    <div class="sec"><h2>🏆 Top 3 do mês</h2><span class="sub">Vídeos com a maior nota de seguidores + engajamento</span></div>
+    <div class="podium2" id="podium"></div>
 
+    <div class="sec"><h2>💡 Insights automáticos</h2><span class="sub">Gerados a partir dos dados de ${esc(m.label)}</span></div>
+    <div class="insights" id="insights"></div>
+
+    <div class="sec"><h2>📊 Gráficos</h2><span class="sub">Passe o mouse para ver os detalhes</span></div>
+    <div class="charts">
+      <div class="card chartcard"><h3>Pontuação — Top 10</h3><div class="hint">Quanto cada vídeo ganhou em seguidores e em engajamento</div><div class="cv"><canvas id="chScore"></canvas></div></div>
+      <div class="card chartcard"><h3>Seguidores × Engajamento</h3><div class="hint">Cada bolha é um vídeo · tamanho = visualizações · dourado = Top 3</div><div class="cv"><canvas id="chBubble"></canvas></div></div>
+      <div class="card chartcard"><h3>Como as pessoas interagiram</h3><div class="hint">Composição das interações do mês</div><div class="cv"><canvas id="chMix"></canvas></div></div>
+      <div class="card chartcard"><h3>Nota média por formato</h3><div class="hint">Média da pontuação dos vídeos de cada tipo</div><div class="cv"><canvas id="chCat"></canvas></div></div>
+      <div class="card chartcard span2"><h3>Evolução mês a mês</h3><div class="hint">Seguidores e interações de cada mês carregado</div><div class="cv short"><canvas id="chEvo"></canvas></div><div class="evo-note" id="evoNote"></div></div>
+    </div>
+
+    <div class="sec"><h2>📋 Ranking completo</h2><span class="sub">Clique em uma linha para ver o detalhe da nota</span></div>
     <div class="card pad">
       <div class="toolbar">
         <input type="search" id="q" placeholder="Filtrar por nome do vídeo…" />
@@ -469,47 +606,231 @@ function renderView(){
         <button class="btn" id="reupload">↻ Atualizar PDF deste mês</button>
         <button class="btn gold" id="csv">Exportar CSV</button>
       </div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr>
-            ${th("rank","#")}${th("video","Vídeo")}${th("score","Score")}
-            ${th("folAbs","Seguidores")}
-            ${th("like","Curtidas")}${th("comentario","Comentários")}${th("repost","Repost")}
-            ${th("envio","Encaminh.")}${th("salvamento","Salvam.")}
-            ${th("views","Visualizações")}
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
+      <div class="tablewrap" id="tableBox"></div>
       <div class="legend">
         <span><b class="seg1"></b>Seguidores · 50</span>
         <span><b class="seg3"></b>Engajamento total · 50</span>
       </div>
     </div>`;
 
-  document.getElementById("q").oninput = e=>{
-    const term = e.target.value.toLowerCase();
-    document.querySelectorAll("tbody tr[data-v]").forEach(tr=>{
-      const hit = tr.getAttribute("data-v").toLowerCase().includes(term);
-      tr.style.display = hit ? "" : "none";
-      const det = tr.nextElementSibling;
-      if(det && det.classList.contains("detail"))
-        det.style.display = (hit && expanded.has(tr.getAttribute("data-v"))) ? "" : "none";
-    });
-  };
+  renderPodium();
+  renderInsights();
+  renderTable();
+  buildCharts();
+
+  document.getElementById("q").oninput = e=>{ filterTerm = e.target.value.toLowerCase(); applyFilter(); };
   document.getElementById("reupload").onclick = ()=>openModal(key);
   document.getElementById("csv").onclick = ()=>exportCSV(m,data);
-  document.querySelectorAll("thead th").forEach(t=>{
+}
+
+/* ---------- pódio com player ---------- */
+function renderPodium(){
+  const {key,data} = curView, top = data.slice(0,3);
+  const tags = ["Ouro","Prata","Bronze"];
+  document.getElementById("podium").innerHTML = top.map((o,i)=>{
+    const url = getLink(key,o.p.video), emb = url ? embedFor(url) : null;
+    let media;
+    if(emb && (emb.kind==="ig" || emb.kind==="tt")) media = `<div class="vbox tall"><iframe src="${emb.src}" loading="lazy" allowfullscreen scrolling="no"></iframe></div>`;
+    else if(emb && emb.kind==="yt") media = `<div class="vbox wide"><iframe src="${emb.src}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+    else if(emb && emb.kind==="file") media = `<div class="vbox wide"><video src="${esc(emb.src)}" controls playsinline preload="metadata"></video></div>`;
+    else if(emb) media = `<div class="vph"><div class="play">🔗</div><a href="${esc(emb.src)}" target="_blank" rel="noopener">Abrir vídeo em nova aba</a></div>`;
+    else media = `<div class="vph"><div class="play">▶</div><div class="vtxt">Ainda sem link do vídeo</div>
+        <form class="lnk" data-i="${i}"><input type="url" name="url" required placeholder="Cole o link do Reel/Post (Instagram, YouTube, TikTok)" /><button class="btn primary">Salvar</button></form></div>`;
+    const acts = url ? `<div class="vact"><button data-act="edit" data-i="${i}">✎ Trocar link</button><button data-act="rm" data-i="${i}">Remover</button></div>` : "";
+    return `
+    <div class="card pod2 p${i+1}">
+      <div class="phead"><span class="medal2">${i+1}º</span><span class="ptag">${tags[i]}</span></div>
+      <div class="pname">${esc(o.p.video)}</div>
+      <div class="pscore">${f1(o.score)}<span> / 100</span></div>
+      <div class="mini">${bar(o)}</div>
+      <div class="chips">
+        <span class="chip"><b>${fmt(o.folAbs)}</b> seguidores</span>
+        <span class="chip"><b>${fmt(o.engRaw)}</b> engaj.</span>
+        <span class="chip"><b>${fmt(o.envio)}</b> envios</span>
+        <span class="chip"><b>${fmt(o.salvamento)}</b> salvos</span>
+        <span class="chip mute"><b>${fmt(o.views)}</b> views</span>
+      </div>
+      ${media}${acts}
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#podium form.lnk").forEach(f=>f.onsubmit = e=>{
+    e.preventDefault(); const i = +f.dataset.i;
+    setLink(key, top[i].p.video, f.url.value.trim()); renderPodium();
+  });
+  document.querySelectorAll("#podium .vact button").forEach(b=>b.onclick = ()=>{
+    const i = +b.dataset.i, v = top[i].p.video;
+    if(b.dataset.act==="rm"){ setLink(key,v,""); renderPodium(); return; }
+    const nu = prompt("Cole o novo link do vídeo:", getLink(key,v));
+    if(nu!==null){ setLink(key,v,nu.trim()); renderPodium(); }
+  });
+}
+
+/* ---------- insights ---------- */
+function renderInsights(){
+  const {m,data,prev} = curView;
+  const epv = o => o.views>0 ? o.engRaw/o.views : 0;
+  const f1k = o => o.views>0 ? o.folAbs*1000/o.views : 0;
+  const best = (fn,filter=()=>true) => data.filter(filter).sort((a,b)=>fn(b)-fn(a))[0];
+  const medEng = median(data.map(o=>o.engRaw)), medEpv = median(data.map(epv)), medF1k = median(data.map(f1k));
+  const bd = (t,k="info") => `<span class="badge ${k}">${t}</span>`;
+  const rk = o => bd(`#${o.rank} no ranking`, o.rank<=3?"gold":"info");
+  const cards = [];
+
+  const s = best(o=>o.folAbs);
+  if(s && s.folAbs>0){
+    const totF = data.reduce((a,x)=>a+x.folAbs,0);
+    cards.push({ic:"👥",c:"#c9a24b",lbl:"Maior geração de seguidores",o:s,val:`${fmt(s.folAbs)} seguidores`,b:rk(s)+bd(`${fN(s.folAbs/Math.max(1,totF)*100,0)}% do mês`,"ok")});
+  }
+  const e = best(o=>o.engRaw);
+  cards.push({ic:"🔥",c:"#1f6fc4",lbl:"Maior engajamento",o:e,val:`${fmt(e.engRaw)} pts`,b:rk(e)+(medEng?bd(`${fN(e.engRaw/medEng,1)}× a mediana`,"ok"):"")});
+  const sh = best(o=>o.envio+o.repost);
+  cards.push({ic:"📤",c:"#12a89f",lbl:"Mais compartilhado",o:sh,val:`${fmt(sh.envio)} envios · ${fmt(sh.repost)} reposts`,b:rk(sh)});
+  const sv = best(o=>o.salvamento);
+  cards.push({ic:"🔖",c:"#6366e8",lbl:"Mais salvo",o:sv,val:`${fmt(sv.salvamento)} salvamentos`,b:rk(sv)+bd("conteúdo de consulta","info")});
+  const cv = best(f1k,o=>o.views>=1000&&o.folAbs>0);
+  if(cv) cards.push({ic:"🎯",c:"#a97f28",lbl:"Melhor conversão em seguidores",o:cv,val:`${fN(f1k(cv),2)} por 1.000 views`,b:rk(cv)+bd(`mediana ${fN(medF1k,2)}`,"info")});
+  const ef = best(epv,o=>o.views>=1000);
+  if(ef) cards.push({ic:"⚡",c:"#4f9ae0",lbl:"Maior reação por visualização",o:ef,val:`${fN(epv(ef)*100,1)} pts a cada 100 views`,b:rk(ef)+bd(`mediana ${fN(medEpv*100,1)}`,"info")});
+  const rc = best(o=>o.views);
+  const lowReact = medEpv>0 && epv(rc) < medEpv*0.5;
+  cards.push({ic:"👀",c:"#9aa7b4",lbl:"Maior alcance",o:rc,val:`${fmt(rc.views)} views`,b:rk(rc)+(lowReact?bd("reação baixa — alcance provavelmente pago","warn"):bd("alcance com boa reação","ok"))});
+
+  const cat = {};
+  data.forEach(o=>{ const c = category(o.p.video); (cat[c] = cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum += o.score; });
+  const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n}));
+  const cand = cl.filter(x=>x.n>=2); const champ = (cand.length?cand:cl).sort((a,b)=>b.avg-a.avg)[0];
+  if(champ) cards.push({ic:"🎬",c:"#c9a24b",lbl:"Formato campeão",t:champ.c,val:`nota média ${f1(champ.avg)}`,b:bd(`${champ.n} ${champ.n>1?"posts":"post"}`,"info")+bd(`${cl.length} ${cl.length>1?"formatos":"formato"}`,"info")});
+
+  if(prev){
+    const sum = (ps,k)=>ps.reduce((a,p)=>a+(p[k]||0),0);
+    const pf = sum(prev.posts,"seguidores"), cf = sum(m.posts,"seguidores");
+    const d = pf>0 ? (cf-pf)/pf*100 : null;
+    const good = d===null || d>=0;
+    cards.push({ic:good?"📈":"📉",c:good?"#17794a":"#a52a2a",lbl:`Evolução vs ${prev.label.split(" ")[0]}`,t:"Seguidores gerados no mês",val:d===null?`${fmt(cf)} seguidores`:`${d>=0?"+":""}${fN(d,1)}%`,b:bd(`${fmt(pf)} → ${fmt(cf)}`,good?"ok":"bad")});
+  }
+
+  document.getElementById("insights").innerHTML = cards.map(c=>`
+    <div class="card ins" style="--c:${c.c}">
+      <div class="ic">${c.ic}</div>
+      <div class="ib">
+        <div class="lbl">${c.lbl}</div>
+        <div class="ttl">${c.t ? esc(c.t) : esc(c.o.p.video)}</div>
+        <div class="val">${c.val}</div>
+        <div class="bds">${c.b||""}</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ---------- gráficos (Chart.js) ---------- */
+function buildCharts(){
+  if(!window.Chart){ document.querySelectorAll(".cv").forEach(el=>el.innerHTML='<div class="evo-note">Gráficos indisponíveis (sem conexão com a biblioteca).</div>'); return; }
+  const {data,keys} = curView;
+  Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+  Chart.defaults.color = "#69768c";
+  const gold = "#c9a24b", goldD = "#a97f28", blue = "#1f6fc4", blueS = "#4f9ae0", teal = "#12a89f", violet = "#6366e8";
+  const add = c => charts.push(c);
+
+  // 1) Top 10 — pontuação empilhada
+  const t10 = data.slice(0,10);
+  add(new Chart(document.getElementById("chScore"),{
+    type:"bar",
+    data:{labels:t10.map(o=>shortName(o.p.video,28)),datasets:[
+      {label:"Seguidores",data:t10.map(o=>+o.s1.toFixed(1)),backgroundColor:goldD,borderRadius:4},
+      {label:"Engajamento",data:t10.map(o=>+o.s3.toFixed(1)),backgroundColor:blue,borderRadius:4}]},
+    options:{indexAxis:"y",maintainAspectRatio:false,scales:{x:{stacked:true,max:100,grid:{color:"#eef1f6"}},y:{stacked:true,grid:{display:false},ticks:{autoSkip:false}}},
+      plugins:{legend:{position:"bottom"},tooltip:{callbacks:{title:i=>t10[i[0].dataIndex].p.video,label:c=>`${c.dataset.label}: ${f1(c.raw)} pts`,footer:i=>`Total: ${f1(t10[i[0].dataIndex].score)} / 100`}}}}
+  }));
+
+  // 2) Bolhas — seguidores x engajamento (tamanho = views)
+  const maxV = Math.max(...data.map(o=>o.views),1);
+  const pts = data.map(o=>({x:Math.max(1,o.engRaw),y:o.folAbs+1,r:4+18*Math.sqrt(o.views/maxV),o}));
+  pts.forEach(p=>p.y=Math.log(p.o.folAbs+1));
+  const maxSeg = Math.max(...data.map(o=>o.folAbs));
+  add(new Chart(document.getElementById("chBubble"),{
+    type:"bubble",
+    data:{datasets:[{label:"Vídeos",data:pts,backgroundColor:pts.map(p=>p.o.rank<=3?"rgba(201,162,75,.85)":"rgba(31,111,196,.45)"),borderColor:pts.map(p=>p.o.rank<=3?goldD:blue),borderWidth:1}]},
+    options:{maintainAspectRatio:false,
+      scales:{x:{type:"logarithmic",title:{display:true,text:"Engajamento (ponderado)"},grid:{color:"#eef1f6"},ticks:{maxRotation:0,callback:v=>{ const l=Math.round(v/Math.pow(10,Math.floor(Math.log10(v)))); return [1,2,5].includes(l)?fmt(v):""; }}},
+              y:{type:"linear",title:{display:true,text:"Seguidores"},grid:{color:"#eef1f6"},min:0,
+                 afterBuildTicks:ax=>{ ax.ticks = [0,1,3,10,30,100,300,1000,2000].filter(v=>v<=Math.max(maxSeg,1)*1.5).map(v=>({value:Math.log(1+v)})); },
+                 ticks:{callback:v=>fmt(Math.round(Math.exp(v)-1))}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>i[0].raw.o.p.video,label:c=>{const o=c.raw.o;return [`#${o.rank} no ranking · nota ${f1(o.score)}`,`Seguidores: ${fmt(o.folAbs)}`,`Engajamento: ${fmt(o.engRaw)}`,`Views: ${fmt(o.views)}`];}}}}}
+  }));
+
+  // 3) Composição das interações
+  const sumK = k => data.reduce((a,o)=>a+o[k],0);
+  const mix = [["Curtidas",sumK("like"),blue],["Comentários",sumK("comentario"),teal],["Reposts",sumK("repost"),violet],["Envios",sumK("envio"),gold],["Salvamentos",sumK("salvamento"),goldD]];
+  const mixTot = mix.reduce((a,x)=>a+x[1],0)||1;
+  add(new Chart(document.getElementById("chMix"),{
+    type:"doughnut",
+    data:{labels:mix.map(x=>x[0]),datasets:[{data:mix.map(x=>x[1]),backgroundColor:mix.map(x=>x[2]),borderWidth:2,borderColor:"#fff"}]},
+    options:{maintainAspectRatio:false,cutout:"62%",plugins:{legend:{position:"right"},tooltip:{callbacks:{label:c=>`${c.label}: ${fmt(c.raw)} (${fN(c.raw/mixTot*100,1)}%)`}}}}
+  }));
+
+  // 4) Nota média por formato
+  const cat = {}; data.forEach(o=>{ const c=category(o.p.video); (cat[c]=cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum+=o.score; });
+  const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n})).sort((a,b)=>b.avg-a.avg);
+  add(new Chart(document.getElementById("chCat"),{
+    type:"bar",
+    data:{labels:cl.map(x=>`${x.c} (${x.n})`),datasets:[{label:"Nota média",data:cl.map(x=>+x.avg.toFixed(1)),backgroundColor:cl.map((x,i)=>i===0?gold:blueS),borderRadius:6}]},
+    options:{indexAxis:"y",maintainAspectRatio:false,scales:{x:{grid:{color:"#eef1f6"}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Nota média: ${f1(c.raw)}`}}}}
+  }));
+
+  // 5) Evolução mês a mês
+  const asc = [...keys].reverse(), evo = document.getElementById("evoNote");
+  if(asc.length<2){
+    document.querySelector("#chEvo").parentElement.style.display = "none";
+    evo.textContent = "Carregue mais um mês para ver a evolução (seguidores e interações lado a lado).";
+  } else {
+    const ms = asc.map(k=>store.months[k]);
+    const S = ms.map(x=>x.posts.reduce((a,p)=>a+(p.seguidores||0),0));
+    const E = ms.map(x=>x.posts.reduce((a,p)=>a+p.like+p.comentario+p.repost+p.envio+p.salvamento,0));
+    add(new Chart(document.getElementById("chEvo"),{
+      type:"bar",
+      data:{labels:ms.map(x=>x.label),datasets:[
+        {label:"Seguidores",data:S,backgroundColor:gold,borderRadius:6,yAxisID:"y"},
+        {label:"Interações",data:E,backgroundColor:blue,borderRadius:6,yAxisID:"y1"}]},
+      options:{maintainAspectRatio:false,scales:{y:{position:"left",title:{display:true,text:"Seguidores"},grid:{color:"#eef1f6"},beginAtZero:true},y1:{position:"right",title:{display:true,text:"Interações"},grid:{display:false},beginAtZero:true}},plugins:{legend:{position:"bottom"}}}
+    }));
+  }
+}
+
+/* ---------- tabela ---------- */
+function renderTable(){
+  const {data} = curView;
+  const rows = applySort(data).map(o=>rowHTML(o)).join("");
+  document.getElementById("tableBox").innerHTML = `
+    <table>
+      <thead><tr>
+        ${th("rank","#")}${th("video","Vídeo")}${th("score","Score")}
+        ${th("folAbs","Seguidores")}
+        ${th("like","Curtidas")}${th("comentario","Comentários")}${th("repost","Repost")}
+        ${th("envio","Encaminh.")}${th("salvamento","Salvam.")}
+        ${th("views","Visualizações")}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  document.querySelectorAll("#tableBox thead th").forEach(t=>{
     t.onclick = ()=>{ const k=t.dataset.k; if(!k) return;
       if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir = (k==="video")?1:-1; }
-      renderView();
+      renderTable();
     };
   });
-  document.querySelectorAll("tbody tr[data-v]").forEach(tr=>{
+  document.querySelectorAll("#tableBox tbody tr[data-v]").forEach(tr=>{
     tr.onclick = ()=>{ const v=tr.getAttribute("data-v");
       if(expanded.has(v)) expanded.delete(v); else expanded.add(v);
-      renderView();
+      renderTable();
     };
+  });
+  applyFilter();
+}
+function applyFilter(){
+  document.querySelectorAll("#tableBox tbody tr[data-v]").forEach(tr=>{
+    const hit = tr.getAttribute("data-v").toLowerCase().includes(filterTerm);
+    tr.style.display = hit ? "" : "none";
+    const det = tr.nextElementSibling;
+    if(det && det.classList.contains("detail"))
+      det.style.display = (hit && expanded.has(tr.getAttribute("data-v"))) ? "" : "none";
   });
 }
 

@@ -15,6 +15,11 @@ relatório mensal em PDF. O cálculo roda no navegador; os dados publicados vêm
   aparecem para **qualquer pessoa** que abrir o link. Meses subidos pelo navegador ficam só ali
   (etiqueta "local") até serem publicados: clique em **Exportar dados** e substitua o `dados.json`
   no GitHub (ou peça para publicarem).
+- **Top 3 com player.** Os 3 primeiros do mês aparecem em pódio (ouro, prata, bronze). Cole o link do
+  Reel/Post (Instagram, YouTube ou TikTok) em cada card para o vídeo tocar na própria página. Os links
+  entram no **Exportar dados** (`dados.json`, campo `links`) para todos verem.
+- **Insights automáticos**, **gráficos interativos** (pontuação Top 10, bolhas seguidores × engajamento,
+  mix de interações, nota por formato e evolução mês a mês) e variação em relação ao mês anterior.
 - **Exportar CSV** do ranking do mês.
 
 ## Metodologia do score (0–100)
