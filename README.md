@@ -19,9 +19,8 @@ relatório mensal em PDF. O cálculo roda no navegador; os dados publicados vêm
   (Instagram, YouTube ou TikTok) ao lado dos números e de uma análise em texto ("Por que está no pódio").
 - **Coluna "Link" no PDF.** Se o relatório trouxer a coluna Link (texto ou link clicável), o site lê o
   endereço de cada post e o vídeo do Top 3 já aparece sozinho. Também dá para colar/trocar o link no card.
-- **Destaques do mês** (agrupados em Resultado, Engajamento e Alcance/formato) e **gráficos** simples:
-  nota final Top 10, quem mais trouxe seguidores, quem mais gerou engajamento, mix de interações e
-  nota média por formato.
+- **Gráficos** simples: nota final Top 10, quem mais trouxe seguidores, quem mais gerou engajamento
+  e mix de interações.
 - **Exportar CSV** do ranking do mês.
 
 ## Metodologia do score (0–100)

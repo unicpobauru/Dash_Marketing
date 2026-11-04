@@ -647,16 +647,12 @@ function renderView(){
     <div class="sec"><h2>🏆 Top 3 do mês</h2><span class="sub">Os 3 vídeos com maior nota, com a análise de cada um</span></div>
     <div class="podlist" id="podium"></div>
 
-    <div class="sec"><h2>💡 Destaques do mês</h2><span class="sub">Gerados a partir dos dados de ${esc(m.label)}</span></div>
-    <div class="igroups" id="insights"></div>
-
     <div class="sec"><h2>📊 Gráficos</h2><span class="sub">Passe o mouse sobre as barras para ver os detalhes</span></div>
     <div class="charts">
       <div class="card chartcard"><h3>Nota final — Top 10</h3><div class="hint">Como ler: quanto maior a barra, melhor a nota. <b style="color:#a97f28">Dourado</b> = pontos por seguidores · <b style="color:#1f6fc4">Azul</b> = pontos por engajamento.</div><div class="cv"><canvas id="chScore"></canvas></div></div>
       <div class="card chartcard"><h3>Quem mais trouxe seguidores</h3><div class="hint">Seguidores novos gerados por cada vídeo (8 primeiros).</div><div class="cv"><canvas id="chSeg"></canvas></div></div>
       <div class="card chartcard"><h3>Quem mais gerou engajamento</h3><div class="hint">Curtidas (×1) + comentários (×2) + reposts, envios e salvamentos (×3) — 8 primeiros.</div><div class="cv"><canvas id="chEng"></canvas></div></div>
       <div class="card chartcard"><h3>Como as pessoas interagiram</h3><div class="hint">Fatia de cada tipo de interação no total do mês.</div><div class="cv"><canvas id="chMix"></canvas></div></div>
-      <div class="card chartcard span2"><h3>Qual formato rende mais</h3><div class="hint">Nota média dos vídeos de cada tipo. Entre parênteses, quantos vídeos do mês são daquele formato.</div><div class="cv short"><canvas id="chCat"></canvas></div></div>
     </div>
 
     <div class="sec"><h2>📋 Ranking completo</h2><span class="sub">Clique em uma linha para ver o detalhe da nota</span></div>
@@ -675,7 +671,6 @@ function renderView(){
     </div>`;
 
   renderPodium();
-  renderInsights();
   renderTable();
   buildCharts();
 
@@ -704,7 +699,7 @@ function topInsights(o,st){
   if(o.folAbs>0) L.push(["👥",`Trouxe <b>${fmt(o.folAbs)} seguidores</b> — ${fN(o.folAbs/Math.max(1,st.totF)*100,0)}% de todos os seguidores do mês (${ord(st.rSeg.get(o))} em seguidores).`]);
   else L.push(["👥","Não gerou seguidores diretos neste mês."]);
   const x = st.medEng ? o.engRaw/st.medEng : 0;
-  L.push(["🔥",`Engajamento de <b>${fmt(o.engRaw)} pontos</b>${x?`, ${fN(x,1)}× a mediana do mês`:""} (${ord(st.rEng.get(o))} em engajamento).`]);
+  L.push(["🔥",x ? `Engajamento de <b>${fN(x,1)}× a mediana do mês</b> (${ord(st.rEng.get(o))} em engajamento).` : `${ord(st.rEng.get(o))} em engajamento no mês.`]);
   const intent = o.engRaw>0 ? (o.engRaw-o.like)/o.engRaw*100 : 0;
   const leitura = intent>=65 ? "o público guarda e repassa este conteúdo" : intent>=45 ? "mistura de curtidas com ações de interesse" : "predomínio de curtidas";
   L.push(["🔖",`<b>${fN(intent,0)}%</b> do engajamento veio de comentários, envios, reposts e salvamentos — ${leitura}. Foram <b>${fmt(o.envio)} envios</b> e <b>${fmt(o.salvamento)} salvamentos</b>.`]);
@@ -742,7 +737,7 @@ function renderPodium(){
         <div class="pscorerow"><div class="pscore">${f1(o.score)}<span> / 100</span></div><div class="mini">${bar(o)}</div></div>
         <div class="tiles">
           <div class="tile"><b>${fmt(o.folAbs)}</b><span>Seguidores</span></div>
-          <div class="tile"><b>${fmt(o.engRaw)}</b><span>Engajamento</span></div>
+          <div class="tile"><b>${fmt(o.views)}</b><span>Visualizações</span></div>
           <div class="tile"><b>${fmt(o.envio)}</b><span>Envios</span></div>
           <div class="tile"><b>${fmt(o.salvamento)}</b><span>Salvamentos</span></div>
         </div>
@@ -761,58 +756,6 @@ function renderPodium(){
     const nu = prompt("Cole o novo link do vídeo:", getLink(key,v,top[i].p));
     if(nu!==null){ setLink(key,v,nu.trim()); renderPodium(); }
   });
-}
-
-/* ---------- destaques do mês, organizados em 3 grupos ---------- */
-function renderInsights(){
-  const {data} = curView, st = monthStats(data);
-  const best = (fn,filter=()=>true) => data.filter(filter).sort((a,b)=>fn(b)-fn(a))[0];
-  const bd = (t,k="info") => `<span class="badge ${k}">${t}</span>`;
-  const rk = o => bd(`${ord(o.rank)} no ranking`, o.rank<=3?"gold":"info");
-  const G = [
-    {t:"Resultado",ic:"🎯",c:"#c9a24b",rows:[]},
-    {t:"Engajamento",ic:"🔥",c:"#1f6fc4",rows:[]},
-    {t:"Alcance e formato",ic:"📡",c:"#12a89f",rows:[]}
-  ];
-  const add = (g,ic,lbl,name,val,b) => G[g].rows.push({ic,lbl,name,val,b});
-
-  const s = best(o=>o.folAbs);
-  if(s && s.folAbs>0) add(0,"👥","Mais seguidores",s.p.video,`${fmt(s.folAbs)} seguidores`,rk(s)+bd(`${fN(s.folAbs/Math.max(1,st.totF)*100,0)}% do mês`,"ok"));
-  const cv = best(st.f1k,o=>o.views>=1000&&o.folAbs>0);
-  if(cv) add(0,"🎯","Melhor conversão em seguidores",cv.p.video,`${fN(st.f1k(cv),2)} a cada 1.000 views`,rk(cv)+bd(`mediana ${fN(st.medF1k,2)}`));
-
-  const e = best(o=>o.engRaw);
-  add(1,"🔥","Maior engajamento",e.p.video,`${fmt(e.engRaw)} pontos`,rk(e)+(st.medEng?bd(`${fN(e.engRaw/st.medEng,1)}× a mediana`,"ok"):""));
-  const sh = best(o=>o.envio+o.repost);
-  add(1,"📤","Mais compartilhado",sh.p.video,`${fmt(sh.envio)} envios · ${fmt(sh.repost)} reposts`,rk(sh));
-  const sv = best(o=>o.salvamento);
-  add(1,"🔖","Mais salvo",sv.p.video,`${fmt(sv.salvamento)} salvamentos`,rk(sv));
-  const ef = best(st.epv,o=>o.views>=1000);
-  if(ef) add(1,"⚡","Maior reação por visualização",ef.p.video,`${fN(st.epv(ef)*100,1)} pontos a cada 100 views`,rk(ef)+bd(`mediana ${fN(st.medEpv*100,1)}`));
-
-  const rc = best(o=>o.views);
-  const low = st.medEpv>0 && st.epv(rc) < st.medEpv*0.5;
-  add(2,"👀","Maior alcance",rc.p.video,`${fmt(rc.views)} views`,rk(rc)+(low?bd("reação baixa para o alcance","warn"):bd("boa reação","ok")));
-  const cat = {};
-  data.forEach(o=>{ const c = category(o.p.video); (cat[c] = cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum += o.score; });
-  const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n}));
-  const cand = cl.filter(x=>x.n>=2), champ = (cand.length?cand:cl).sort((a,b)=>b.avg-a.avg)[0];
-  if(champ) add(2,"🎬","Formato que mais rende",champ.c,`nota média ${f1(champ.avg)}`,bd(`${champ.n} ${champ.n>1?"vídeos":"vídeo"}`)+bd(`${cl.length} formatos no mês`));
-
-  document.getElementById("insights").innerHTML = G.filter(g=>g.rows.length).map(g=>`
-    <div class="card igroup" style="--c:${g.c}">
-      <div class="igh"><span>${g.ic}</span>${g.t}</div>
-      ${g.rows.map(r=>`
-      <div class="irow">
-        <div class="ic">${r.ic}</div>
-        <div class="ib">
-          <div class="lbl">${r.lbl}</div>
-          <div class="ttl">${esc(r.name)}</div>
-          <div class="val">${r.val}</div>
-          <div class="bds">${r.b||""}</div>
-        </div>
-      </div>`).join("")}
-    </div>`).join("");
 }
 
 /* ---------- gráficos (Chart.js) ---------- */
@@ -871,12 +814,6 @@ function buildCharts(){
     data:{labels:mix.map(x=>`${x[0]} — ${fN(x[1]/mixTot*100,0)}%`),datasets:[{data:mix.map(x=>x[1]),backgroundColor:mix.map(x=>x[2]),borderWidth:2,borderColor:"#fff"}]},
     options:{maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"right",labels:{boxWidth:14,padding:12}},tooltip:{callbacks:{label:c=>`${fmt(c.raw)} interações`}}}}
   }));
-
-  // 5) Qual formato rende mais
-  const cat = {}; data.forEach(o=>{ const c=category(o.p.video); (cat[c]=cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum+=o.score; });
-  const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n})).sort((a,b)=>b.avg-a.avg);
-  add(hbar("chCat",cl.map(x=>`${x.c} (${x.n} ${x.n>1?"vídeos":"vídeo"})`),[{label:"Nota média",data:cl.map(x=>+x.avg.toFixed(1)),backgroundColor:cl.map((x,i)=>i===0?gold:blueS),borderRadius:5}],
-    {plugins:{legend:{display:false},valueLabels:{fmt:v=>f1(v)},tooltip:{callbacks:{label:c=>`Nota média: ${f1(c.raw)}`}}}}));
 }
 
 /* ---------- tabela ---------- */
