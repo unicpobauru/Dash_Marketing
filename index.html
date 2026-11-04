@@ -281,6 +281,8 @@
     .pscorerow{flex-direction:column;align-items:stretch;gap:8px}
     .igroups{grid-template-columns:1fr}
   }
+  .vbox.ig{background:#fff;max-width:440px;margin:0 auto;height:auto}
+  .vbox.ig iframe{height:640px}
 </style>
 </head>
 <body>
@@ -713,6 +715,15 @@ function topInsights(o,st){
   return L;
 }
 
+/* O embed do Instagram informa a altura real do conteúdo; ajustamos o iframe para não cortar o vídeo */
+window.addEventListener("message", e=>{
+  let host = ""; try{ host = new URL(e.origin).hostname; }catch(_){ return; }
+  if(!host.endsWith("instagram.com")) return;
+  let d = e.data; if(typeof d==="string"){ try{ d = JSON.parse(d); }catch(_){ return; } }
+  if(d && d.type==="MEASURE" && d.details && d.details.height)
+    document.querySelectorAll("iframe.igf").forEach(f=>{ if(f.contentWindow===e.source) f.style.height = Math.ceil(d.details.height)+"px"; });
+});
+
 /* ---------- pódio com player + análise em texto ---------- */
 function renderPodium(){
   const {key,data} = curView, top = data.slice(0,3), st = monthStats(data);
@@ -720,7 +731,8 @@ function renderPodium(){
   document.getElementById("podium").innerHTML = top.map((o,i)=>{
     const url = getLink(key,o.p.video,o.p), emb = url ? embedFor(url) : null;
     let media;
-    if(emb && (emb.kind==="ig" || emb.kind==="tt")) media = `<div class="vbox tall"><iframe src="${emb.src}" loading="lazy" allowfullscreen scrolling="no"></iframe></div>`;
+    if(emb && emb.kind==="ig") media = `<div class="vbox ig"><iframe class="igf" src="${emb.src}" height="640" frameborder="0" allowtransparency="true" allowfullscreen scrolling="no"></iframe></div>`;
+    else if(emb && emb.kind==="tt") media = `<div class="vbox tall"><iframe src="${emb.src}" loading="lazy" allowfullscreen scrolling="no"></iframe></div>`;
     else if(emb && emb.kind==="yt") media = `<div class="vbox wide"><iframe src="${emb.src}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
     else if(emb && emb.kind==="file") media = `<div class="vbox wide"><video src="${esc(emb.src)}" controls playsinline preload="metadata"></video></div>`;
     else if(emb) media = `<div class="vph"><div class="play">🔗</div><a href="${esc(emb.src)}" target="_blank" rel="noopener">Abrir vídeo em nova aba</a></div>`;
