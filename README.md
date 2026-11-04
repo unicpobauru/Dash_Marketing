@@ -11,10 +11,10 @@ relatório mensal em PDF. O cálculo roda no navegador; os dados publicados vêm
   mês/ano e envia o PDF. O site lê a tabela `Vídeo | Like | Comentário | Repost | Envio |
   Salvamento | Visualizações | Seguidores`, calcula o score e monta o ranking.
   Se a leitura automática falhar, há um campo para colar os dados (TAB, vírgula ou 2+ espaços).
-- **Dados compartilhados.** Os meses publicados ficam no arquivo `dados.json` do repositório e
-  aparecem para **qualquer pessoa** que abrir o link. Meses subidos pelo navegador ficam só ali
-  (etiqueta "local") até serem publicados: clique em **Exportar dados** e substitua o `dados.json`
-  no GitHub (ou peça para publicarem).
+- **Publicação automática.** Quem conectar um token do GitHub uma vez (botão 🔑 na barra de abas)
+  publica direto: ao subir um PDF, trocar um link ou remover um mês, o site grava no `dados.json` do
+  repositório e **todo mundo vê em segundos**. Quem só acessa o link apenas visualiza. Sem token, o mês
+  fica salvo só no navegador (etiqueta "local") e dá para usar **Exportar dados**.
 - **Top 3 com player e análise.** Os 3 primeiros do mês aparecem em linhas, com o vídeo tocando na página
   (Instagram, YouTube ou TikTok) ao lado dos números e de uma análise em texto ("Por que está no pódio").
 - **Coluna "Link" no PDF.** Se o relatório trouxer a coluna Link (texto ou link clicável), o site lê o

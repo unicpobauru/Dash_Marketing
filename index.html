@@ -48,7 +48,14 @@
   .tab .del{margin-left:8px;opacity:.55;font-weight:700}
   .tab .del:hover{opacity:1;color:var(--gold-soft)}
   .tab.add{color:var(--gold-soft)}
-  .tab.exp{margin-left:auto;color:var(--gold-soft);font-size:12.5px}
+  .tab.pub{margin-left:auto;color:var(--gold-soft);font-size:12.5px}
+  .tab.pub.on{color:#7fe3a8}
+  .tab.exp{color:var(--gold-soft);font-size:12.5px}
+  .toast{position:fixed;right:18px;bottom:18px;z-index:80;max-width:360px;padding:12px 16px;border-radius:12px;font-size:13.5px;font-weight:600;color:#fff;background:var(--navy);box-shadow:0 10px 30px rgba(10,25,45,.35);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}
+  .toast.show{opacity:1;transform:none}
+  .toast.ok{background:#17794a} .toast.err{background:#a52a2a}
+  .tkp{font-size:13.5px;color:#3a4457;margin:0 0 10px}
+  .tkol{font-size:13px;color:#3a4457;padding-left:20px;margin:0 0 12px;line-height:1.55}
   .lpill{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--gold);color:var(--navy);padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:middle}
 
   main{padding:26px 0 60px}
@@ -358,9 +365,34 @@
   </div>
 </div>
 
+<div class="modal" id="tokModal">
+  <div class="box">
+    <h3>Publicação automática</h3>
+    <div id="tkOff">
+      <p class="tkp">Conecte uma vez neste computador e <b>tudo que você subir passa a aparecer para todo mundo</b>, sozinho. Quem só acessa o link continua apenas visualizando.</p>
+      <ol class="tkol">
+        <li>Abra <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (entre com a conta do repositório).</li>
+        <li>Nome: <b>Dash Marketing</b> · Expiração: a que preferir (ex.: 1 ano).</li>
+        <li><b>Repository access</b> → <i>Only select repositories</i> → <b>Dash_Marketing</b>.</li>
+        <li><b>Permissions</b> → <i>Repository permissions</i> → <b>Contents: Read and write</b>.</li>
+        <li>Clique em <i>Generate token</i>, copie e cole abaixo.</li>
+      </ol>
+      <div class="field"><label>Token</label><input class="txt" id="tkInput" type="password" autocomplete="off" placeholder="github_pat_..." /></div>
+    </div>
+    <div id="tkOn" hidden><p class="tkp">✅ A publicação automática está <b>ativa neste navegador</b>. Meses, links e remoções feitos aqui vão direto para o site de todos.</p></div>
+    <div class="msg" id="tkMsg"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+      <button class="btn" id="tkClose">Fechar</button>
+      <button class="btn" id="tkOffBtn" hidden>Desconectar</button>
+      <button class="btn primary" id="tkConnect">Conectar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <footer>
   <img id="ftLogo" src="logo-unicpo.png" alt="UniCPO" />
-  Ranking de Posts — os meses publicados aparecem para todos. Meses subidos aqui ficam só neste navegador (etiqueta “local”) até serem publicados.
+  Ranking de Posts — o que é publicado aparece para todos. Quem ativou a publicação automática publica direto; os demais só visualizam.
 </footer>
 
 <script>
@@ -401,10 +433,11 @@ if(!BRANDS[brand]) brand = "unicpo";
 let shared = {brands:{}};
 function sharedMonths(b){ return ((shared.brands||{})[b]||{}).months||{}; }
 async function loadShared(){
-  try{
-    const r = await fetch("dados.json?cb="+Date.now(),{cache:"no-store"});
-    if(r.ok){ const j = await r.json(); if(j && j.brands) shared = j; }
-  }catch(e){ console.warn("dados.json indisponível",e); }
+  try{ shared = (await fetchRemote()).json; }
+  catch(e){
+    try{ const r = await fetch("dados.json?cb="+Date.now(),{cache:"no-store"}); if(r.ok){ const j = await r.json(); if(j && j.brands) shared = j; } }
+    catch(e2){ console.warn("dados.json indisponível",e2); }
+  }
   let changed = false;   // descarta cópias locais idênticas às publicadas
   Object.keys(BRANDS).forEach(b=>{
     const sm = sharedMonths(b), lm = data.brands[b].months;
@@ -418,6 +451,48 @@ async function loadShared(){
 const store = { get months(){ return Object.assign({}, sharedMonths(brand), data.brands[brand].months); } };
 function isLocal(k){ return k in data.brands[brand].months; }
 function isPublished(k){ return k in sharedMonths(brand); }
+/* PUBLISH-START */
+/* ---------- publicação automática (GitHub) ----------
+   Leitura: qualquer pessoa lê o dados.json direto da API do GitHub (atualiza em segundos).
+   Escrita: só quem conectou um token (guardado apenas neste navegador) publica. */
+const GH = {owner:"unicpobauru", repo:"Dash_Marketing", branch:"main", path:"dados.json"};
+const TOKEN_KEY = "unicpo_gh_token";
+const getToken = () => { try{ return localStorage.getItem(TOKEN_KEY)||""; }catch(e){ return ""; } };
+const ghFile = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+const b64 = str => { const bytes = new TextEncoder().encode(str); let bin = ""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); };
+const unb64 = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")), c=>c.charCodeAt(0)));
+function normalizeRemote(j){
+  j = j && typeof j==="object" ? j : {};
+  j.version = 1; j.links = j.links||{}; j.brands = j.brands||{};
+  Object.keys(BRANDS).forEach(b=>{ j.brands[b] = j.brands[b]||{months:{}}; j.brands[b].months = j.brands[b].months||{}; });
+  return j;
+}
+async function fetchRemote(){
+  const tok = getToken();
+  const h = {Accept:"application/vnd.github+json"}; if(tok) h.Authorization = "Bearer "+tok;
+  const r = await fetch(`${ghFile}?ref=${GH.branch}&cb=${Date.now()}`,{headers:h,cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const j = await r.json();
+  return {json:normalizeRemote(JSON.parse(unb64(j.content))), sha:j.sha};
+}
+/* aplica a mudança em cima da versão mais recente publicada e grava no GitHub */
+async function publishChange(mutator,message){
+  const tok = getToken(); if(!tok) throw new Error("publicação não ativada");
+  for(let i=0;i<3;i++){
+    const {json,sha} = await fetchRemote();
+    mutator(json);
+    const r = await fetch(ghFile,{method:"PUT",
+      headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+tok,"Content-Type":"application/json"},
+      body:JSON.stringify({message,branch:GH.branch,sha,content:b64(JSON.stringify(json,null,1))})});
+    if(r.ok){ shared = json; return json; }
+    if(r.status===409 || r.status===422) continue;      // alguém publicou ao mesmo tempo: tenta de novo
+    if(r.status===401 || r.status===403) throw new Error("token sem permissão (precisa de Contents: Read and write)");
+    throw new Error("HTTP "+r.status);
+  }
+  throw new Error("conflito ao gravar");
+}
+/* PUBLISH-END */
+
 function save(){ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }
 function activeKeyFor(b){ return ACTIVE_KEY+"_"+b; }
 let active = localStorage.getItem(activeKeyFor(brand)) || (brand==="unicpo" ? localStorage.getItem(ACTIVE_KEY) : null);
@@ -526,12 +601,18 @@ function renderTabs(){
   keys.forEach(k=>{
     const b = document.createElement("button");
     b.className = "tab" + (k===active?" active":"");
-    b.innerHTML = `${store.months[k].label}${isLocal(k)?' <span class="lpill" title="Salvo só neste navegador — exporte e publique para todos verem">local</span>':''} <span class="del" title="Remover mês">✕</span>`;
+    b.innerHTML = `${store.months[k].label}${isLocal(k)?' <span class="lpill" title="Salvo só neste navegador — ative a publicação automática (🔑) para todos verem">local</span>':''} <span class="del" title="Remover mês">✕</span>`;
     b.onclick = e=>{
       if(e.target.classList.contains("del")){
-        if(!isLocal(k)){
-          alert("Este mês está publicado para todos (arquivo dados.json no GitHub). Para removê-lo, edite ou peça a remoção no dados.json.");
-        } else if(confirm(isPublished(k) ? `Descartar a versão local de "${store.months[k].label}"? Volta a valer a versão publicada.` : `Remover "${store.months[k].label}" deste navegador?`)){
+        const lbl = store.months[k].label, bAt = brand;
+        if(isPublished(k)){
+          if(!getToken()){ alert("Este mês está publicado para todos. Para removê-lo, ative a publicação automática (botão 🔑 na barra) e tente de novo."); return; }
+          if(!confirm(`Remover "${lbl}" para TODAS as pessoas que acessam o site?`)) return;
+          toast("Removendo…","info");
+          publishChange(j=>{ delete j.brands[bAt].months[k]; }, `Remove ${BRANDS[bAt].name} ${lbl}`)
+            .then(()=>{ delete data.brands[bAt].months[k]; save(); if(active===k) active=null; renderTabs(); renderView(); toast("Mês removido para todos ✔","ok"); })
+            .catch(err=>toast("Não consegui remover: "+err.message,"err"));
+        } else if(confirm(`Remover "${lbl}" deste navegador?`)){
           delete data.brands[brand].months[k]; save();
           if(active===k) active=null;
           renderTabs(); renderView();
@@ -547,6 +628,12 @@ function renderTabs(){
   add.textContent = "＋ Adicionar mês";
   add.onclick = ()=>openModal();
   el.appendChild(add);
+  const pb = document.createElement("button");
+  pb.className = "tab pub" + (getToken()?" on":"");
+  pb.textContent = getToken() ? "● Publicação automática ativa" : "🔑 Ativar publicação automática";
+  pb.title = getToken() ? "Tudo que você subir é publicado para todos" : "Conecte uma vez para que tudo que você subir apareça para todos";
+  pb.onclick = openTokModal;
+  el.appendChild(pb);
   const exp = document.createElement("button");
   exp.className = "tab exp";
   exp.textContent = "⬇ Exportar dados";
@@ -555,7 +642,7 @@ function renderTabs(){
   el.appendChild(exp);
 }
 function exportAll(){
-  const out = {version:1, links:Object.fromEntries(Object.entries(Object.assign({}, shared.links, data.links)).filter(([,v])=>v)), brands:{}};
+  const out = {version:1, links:Object.assign({}, shared.links, data.links), brands:{}};
   Object.keys(BRANDS).forEach(b=>{ out.brands[b] = {months: Object.assign({}, sharedMonths(b), data.brands[b].months)}; });
   const blob = new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
   const a = document.createElement("a");
@@ -582,9 +669,18 @@ function linkKey(mk,video){ return brand+"|"+mk+"|"+video; }
 function getLink(mk,video,post){
   const k = linkKey(mk,video), L = data.links||{};
   if(k in L) return L[k];                                   // ajuste manual
-  return (post && post.link) || (shared.links||{})[k] || ""; // link vindo do PDF
+  const SL = shared.links||{};
+  if(k in SL) return SL[k];                                   // ajuste publicado (vazio = removido)
+  return (post && post.link) || "";                           // link vindo do PDF
 }
-function setLink(mk,video,url){ data.links = data.links||{}; data.links[linkKey(mk,video)] = url; save(); }
+function setLink(mk,video,url){
+  const k = linkKey(mk,video);
+  data.links = data.links||{}; data.links[k] = url; save();
+  if(!getToken()) return;
+  publishChange(j=>{ j.links[k] = url; }, `Link: ${video}`)
+    .then(()=>{ delete data.links[k]; save(); toast("Link publicado para todos ✔","ok"); })
+    .catch(e=>toast("Link salvo só neste navegador — não consegui publicar: "+e.message,"err"));
+}
 function embedFor(url){
   let u; try{ u = new URL(url); }catch(e){ return null; }
   const h = u.hostname.replace(/^www\./,""); let m;
@@ -977,12 +1073,25 @@ document.getElementById("mSave").onclick = async ()=>{
   }
   if(!posts.length){ msg("Nenhuma linha de post reconhecida. Verifique o arquivo ou cole os dados manualmente.","err"); return; }
 
-  data.brands[brand].months[key] = { label, createdAt: Date.now(), posts };
-  save(store);
-  active = key; localStorage.setItem(activeKeyFor(brand),key);
-  msg(`${posts.length} posts carregados. Salvo só neste navegador: para todos verem, use "Exportar dados" e publique.`,"ok");
+  const bAt = brand, month = { label, createdAt: Date.now(), posts };
+  data.brands[bAt].months[key] = month; save();
+  active = key; localStorage.setItem(activeKeyFor(bAt),key);
   renderTabs();
-  setTimeout(()=>{ closeModal(); renderView(); }, 2600);
+  if(!getToken()){
+    msg(`${posts.length} posts carregados. Salvo só neste navegador — ative a publicação automática (botão 🔑) para todos verem.`,"ok");
+    setTimeout(()=>{ closeModal(); renderView(); }, 3000);
+    return;
+  }
+  msg("Publicando para todos…","info");
+  try{
+    await publishChange(j=>{ j.brands[bAt].months[key] = month; }, `Dados: ${BRANDS[bAt].name} ${label}`);
+    delete data.brands[bAt].months[key]; save(); renderTabs();
+    msg(`${posts.length} posts publicados — todo mundo já vê.`,"ok");
+  }catch(err){
+    console.error(err);
+    msg("Salvo só neste navegador; não consegui publicar: "+err.message,"err");
+  }
+  setTimeout(()=>{ closeModal(); renderView(); }, 2000);
 };
 
 /* ---------- marca (UniCPO / FAINTER) ---------- */
@@ -1003,6 +1112,70 @@ function setBrand(k){
   expanded.clear();
   renderBrand(); renderTabs(); renderView();
 }
+
+/* ---------- aviso rápido ---------- */
+let toastTimer = null;
+function toast(t,type="",ms=4500){
+  const el = document.getElementById("toast"); el.textContent = t; el.className = "toast show "+type;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove("show"), ms);
+}
+
+/* ---------- conexão da publicação automática ---------- */
+const tokModal = document.getElementById("tokModal");
+function tkMsg(t,type){ const e = document.getElementById("tkMsg"); e.className = "msg"+(type?" "+type:""); e.textContent = t; }
+function openTokModal(){
+  const on = !!getToken();
+  document.getElementById("tkInput").value = ""; tkMsg("");
+  document.getElementById("tkOff").hidden = on; document.getElementById("tkOn").hidden = !on;
+  document.getElementById("tkConnect").hidden = on; document.getElementById("tkOffBtn").hidden = !on;
+  tokModal.classList.add("open");
+}
+document.getElementById("tkClose").onclick = ()=>tokModal.classList.remove("open");
+tokModal.onclick = e=>{ if(e.target===tokModal) tokModal.classList.remove("open"); };
+document.getElementById("tkOffBtn").onclick = ()=>{
+  if(!confirm("Desconectar a publicação automática deste navegador?")) return;
+  localStorage.removeItem(TOKEN_KEY); tokModal.classList.remove("open"); renderTabs(); toast("Publicação automática desconectada.");
+};
+async function publishLocalAll(){
+  const lm = {}; let n = 0;
+  Object.keys(BRANDS).forEach(b=>{ const m = data.brands[b].months; const c = Object.keys(m).length; if(c){ lm[b] = m; n += c; } });
+  const ll = data.links||{}, nl = Object.keys(ll).length;
+  if(!n && !nl) return 0;
+  await publishChange(j=>{ Object.keys(lm).forEach(b=>Object.assign(j.brands[b].months, lm[b])); Object.assign(j.links, ll); }, "Publica dados que estavam só em um navegador");
+  Object.keys(BRANDS).forEach(b=>{ data.brands[b].months = {}; }); data.links = {}; save();
+  return n + nl;
+}
+document.getElementById("tkConnect").onclick = async ()=>{
+  const t = document.getElementById("tkInput").value.trim();
+  if(!t){ tkMsg("Cole o token.","err"); return; }
+  tkMsg("Verificando…","info");
+  try{
+    const r = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}`,{headers:{Authorization:"Bearer "+t,Accept:"application/vnd.github+json"}});
+    if(r.status===401) throw new Error("token inválido ou expirado");
+    if(!r.ok) throw new Error("não foi possível validar (HTTP "+r.status+") — confira se o token tem acesso ao repositório Dash_Marketing");
+    const j = await r.json();
+    if(j.permissions && j.permissions.push===false) throw new Error("este token não tem permissão de escrita (Contents: Read and write)");
+    localStorage.setItem(TOKEN_KEY,t);
+  }catch(e){ tkMsg(e.message,"err"); return; }
+  renderTabs();
+  const pend = Object.keys(BRANDS).reduce((a,b)=>a+Object.keys(data.brands[b].months).length,0) + Object.keys(data.links||{}).length;
+  if(pend && confirm(`Há ${pend} item(ns) salvos só neste navegador. Publicar agora para todos?`)){
+    tkMsg("Publicando…","info");
+    try{ await publishLocalAll(); renderTabs(); renderView(); }catch(e){ tkMsg("Conectado, mas não consegui publicar os itens locais: "+e.message,"err"); return; }
+  }
+  tkMsg("Pronto! Publicação automática ativa neste navegador.","ok");
+  setTimeout(()=>tokModal.classList.remove("open"), 1600);
+};
+
+/* atualiza sozinho para quem deixa a página aberta: ao voltar para a aba, busca a versão mais nova */
+let lastSync = Date.now();
+document.addEventListener("visibilitychange", async ()=>{
+  if(document.visibilityState!=="visible" || Date.now()-lastSync<60000) return;
+  lastSync = Date.now();
+  const before = JSON.stringify(shared);
+  await loadShared();
+  if(JSON.stringify(shared)!==before){ renderTabs(); renderView(); }
+});
 
 /* ---------- init ---------- */
 (async()=>{ await loadShared(); renderBrand(); renderTabs(); renderView(); })();
