@@ -231,6 +231,56 @@
     .vbox.tall,.pod2.p1 .vbox.tall{height:440px}
     .sec{flex-wrap:wrap}
   }
+
+  /* ===== v4: pódio em linhas com texto, destaques agrupados, gráficos simples ===== */
+  .podlist{display:grid;gap:18px}
+  .podrow{display:grid;grid-template-columns:340px 1fr;gap:24px;padding:20px 22px;border-left:6px solid var(--mc,var(--gold));align-items:start}
+  .podrow.p1{--mc:var(--gold);grid-template-columns:380px 1fr;background:linear-gradient(100deg,#fdf5e3,#fff 45%);box-shadow:0 0 0 1px var(--gold-soft),0 18px 44px rgba(201,162,75,.26)}
+  .podrow.p2{--mc:#9fb0c2;background:linear-gradient(100deg,#f3f6fa,#fff 45%)}
+  .podrow.p3{--mc:#c58b4d;background:linear-gradient(100deg,#fbf3ec,#fff 45%)}
+  .podrow .vbox.tall{height:470px}
+  .podrow.p1 .vbox.tall{height:540px}
+  .podrow .vph{min-height:300px}
+  .vact a{font-size:12px;color:var(--blue);text-decoration:none;font-weight:600;padding:2px 4px}
+  .vact a:hover{text-decoration:underline}
+  .vact{flex-wrap:wrap;align-items:center}
+  .pinfo{min-width:0}
+  .pinfo .phead{display:flex;align-items:center;gap:10px}
+  .pfmt{font-size:11.5px;font-weight:700;color:var(--muted);background:#eef2f8;border-radius:999px;padding:4px 10px}
+  .pinfo .pname{font-family:Poppins;font-weight:700;font-size:21px;color:var(--navy);margin:12px 0 6px;line-height:1.3;min-height:0}
+  .podrow.p1 .pname{font-size:24px}
+  .pscorerow{display:flex;align-items:center;gap:18px}
+  .pscorerow .pscore{flex:none}
+  .pscorerow .mini{flex:1;margin:0}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 18px}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:0 1px 2px rgba(16,40,80,.04)}
+  .tile b{display:block;font-family:Poppins;font-size:23px;color:var(--navy);line-height:1.2}
+  .podrow.p1 .tile b{font-size:28px}
+  .tile span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+  .whyt{font-weight:800;font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px}
+  .why{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .why li{display:flex;gap:11px;font-size:14px;line-height:1.5;color:#2c3648}
+  .why .bi{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#f1f5fb;font-size:15px}
+  .why b{color:var(--navy)}
+
+  .igroups{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+  .igroup{padding:0;overflow:hidden;border-top:4px solid var(--c)}
+  .igh{padding:12px 16px;font-family:Poppins;font-weight:700;font-size:14.5px;color:var(--navy);background:color-mix(in srgb,var(--c) 11%,#fff);display:flex;gap:8px;align-items:center}
+  .irow{display:flex;gap:12px;padding:13px 16px;border-top:1px solid var(--line)}
+  .irow .ic{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:color-mix(in srgb,var(--c) 14%,#fff)}
+  .irow .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700}
+  .irow .ttl{font-weight:600;font-size:13.5px;margin:3px 0 1px;line-height:1.3}
+  .irow .val{font-family:Poppins;font-weight:800;font-size:17px;color:var(--navy)}
+
+  .chartcard .hint{font-size:12.5px;line-height:1.45}
+
+  @media(max-width:900px){
+    .podrow,.podrow.p1{grid-template-columns:1fr;gap:16px}
+    .podrow .vbox.tall,.podrow.p1 .vbox.tall{height:480px}
+    .tiles{grid-template-columns:repeat(2,1fr)}
+    .pscorerow{flex-direction:column;align-items:stretch;gap:8px}
+    .igroups{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
@@ -295,7 +345,7 @@
       <input class="txt" id="mFile" type="file" accept="application/pdf" />
     </div>
     <div class="field">
-      <label>Ou cole os dados (opcional — colunas separadas por TAB, vírgula ou 2+ espaços)</label>
+      <label>Ou cole os dados (opcional — colunas separadas por TAB, vírgula ou 2+ espaços; a última coluna pode ser o link)</label>
       <textarea class="txt" id="mPaste" rows="3" style="resize:vertical" placeholder="Nome do vídeo   Like   Comentário   Repost   Envio   Salvamento   Visualizações   Seguidores"></textarea>
     </div>
     <div class="msg" id="mMsg"></div>
@@ -419,14 +469,22 @@ async function parsePDF(file){
       const y = Math.round(it.transform[5]/2)*2;
       (rows[y] = rows[y]||[]).push({s:it.str,x:it.transform[4]});
     });
+    // links clicáveis do PDF (coluna "Link"): casa cada link com a linha de mesma altura
+    let anns = [];
+    try{ anns = (await page.getAnnotations()).filter(a=>a.subtype==="Link" && a.url).map(a=>({url:a.url,y:(a.rect[1]+a.rect[3])/2})); }catch(e){}
     Object.keys(rows).sort((a,b)=>b-a).forEach(y=>{
-      lines.push(rows[y].sort((a,b)=>a.x-b.x).map(o=>o.s).join(" ").replace(/\s+/g," ").trim());
+      let ln = rows[y].sort((a,b)=>a.x-b.x).map(o=>o.s).join(" ").replace(/\s+/g," ").trim();
+      if(!/https?:\/\//.test(ln)){
+        const near = anns.map(a=>({a,d:Math.abs(a.y-y)})).filter(o=>o.d<=6).sort((p,q)=>p.d-q.d)[0];
+        if(near) ln += " " + near.a.url;
+      }
+      lines.push(ln);
     });
   }
   return parseLines(lines);
 }
 function parseLines(lines){
-  const rx = /^(.+?)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)$/;
+  const rx = /^(.+?)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)\s+(\d[\d.]*)(?:\s+(https?:\/\/\S+))?$/;
   const num = s => parseInt(String(s).replace(/\./g,"").replace(/[^\d]/g,""),10)||0;
   const out = [];
   for(let ln of lines){
@@ -436,21 +494,24 @@ function parseLines(lines){
     let m = ln.match(rx);
     if(!m){
       const parts = ln.split(/\t+|\s*,\s*|\s{2,}/).filter(Boolean);
+      let link = "";
+      if(parts.length && /^https?:\/\//.test(parts[parts.length-1])) link = parts.pop();
       if(parts.length>=8){
         const tail = parts.slice(-7);
         if(tail.every(t=>/^\d[\d.]*$/.test(t.trim())))
-          m = [null, parts.slice(0,parts.length-7).join(" "), ...tail];
+          m = [null, parts.slice(0,parts.length-7).join(" "), ...tail, link];
       }
     }
     if(!m) continue;
-    out.push({
+    const post = {
       video:m[1].trim(), like:num(m[2]), comentario:num(m[3]), repost:num(m[4]),
       envio:num(m[5]), salvamento:num(m[6]), views:num(m[7]), seguidores:num(m[8])
-    });
+    };
+    if(m[9]) post.link = m[9];
+    out.push(post);
   }
   return out;
 }
-
 /* ---------- render ---------- */
 function monthKeys(){ return Object.keys(store.months).sort().reverse(); }
 
@@ -516,10 +577,10 @@ const shortName = (s,n=30) => { s = s.replace(/[\[\]]/g,""); return s.length>n ?
 
 /* ---------- links dos vídeos (para o player do Top 3) ---------- */
 function linkKey(mk,video){ return brand+"|"+mk+"|"+video; }
-function getLink(mk,video){
+function getLink(mk,video,post){
   const k = linkKey(mk,video), L = data.links||{};
-  if(k in L) return L[k];
-  return (shared.links||{})[k] || "";
+  if(k in L) return L[k];                                   // ajuste manual
+  return (post && post.link) || (shared.links||{})[k] || ""; // link vindo do PDF
 }
 function setLink(mk,video,url){ data.links = data.links||{}; data.links[linkKey(mk,video)] = url; save(); }
 function embedFor(url){
@@ -583,19 +644,19 @@ function renderView(){
       <div class="card kpi k4"><div class="lbl">Visualizações <small>(inclui pago)</small></div><div class="val">${fmt(T.v)}</div>${delta(T.v,P&&P.v)}</div>
     </div>
 
-    <div class="sec"><h2>🏆 Top 3 do mês</h2><span class="sub">Vídeos com a maior nota de seguidores + engajamento</span></div>
-    <div class="podium2" id="podium"></div>
+    <div class="sec"><h2>🏆 Top 3 do mês</h2><span class="sub">Os 3 vídeos com maior nota, com a análise de cada um</span></div>
+    <div class="podlist" id="podium"></div>
 
-    <div class="sec"><h2>💡 Insights automáticos</h2><span class="sub">Gerados a partir dos dados de ${esc(m.label)}</span></div>
-    <div class="insights" id="insights"></div>
+    <div class="sec"><h2>💡 Destaques do mês</h2><span class="sub">Gerados a partir dos dados de ${esc(m.label)}</span></div>
+    <div class="igroups" id="insights"></div>
 
-    <div class="sec"><h2>📊 Gráficos</h2><span class="sub">Passe o mouse para ver os detalhes</span></div>
+    <div class="sec"><h2>📊 Gráficos</h2><span class="sub">Passe o mouse sobre as barras para ver os detalhes</span></div>
     <div class="charts">
-      <div class="card chartcard"><h3>Pontuação — Top 10</h3><div class="hint">Quanto cada vídeo ganhou em seguidores e em engajamento</div><div class="cv"><canvas id="chScore"></canvas></div></div>
-      <div class="card chartcard"><h3>Seguidores × Engajamento</h3><div class="hint">Cada bolha é um vídeo · tamanho = visualizações · dourado = Top 3</div><div class="cv"><canvas id="chBubble"></canvas></div></div>
-      <div class="card chartcard"><h3>Como as pessoas interagiram</h3><div class="hint">Composição das interações do mês</div><div class="cv"><canvas id="chMix"></canvas></div></div>
-      <div class="card chartcard"><h3>Nota média por formato</h3><div class="hint">Média da pontuação dos vídeos de cada tipo</div><div class="cv"><canvas id="chCat"></canvas></div></div>
-      <div class="card chartcard span2"><h3>Evolução mês a mês</h3><div class="hint">Seguidores e interações de cada mês carregado</div><div class="cv short"><canvas id="chEvo"></canvas></div><div class="evo-note" id="evoNote"></div></div>
+      <div class="card chartcard"><h3>Nota final — Top 10</h3><div class="hint">Como ler: quanto maior a barra, melhor a nota. <b style="color:#a97f28">Dourado</b> = pontos por seguidores · <b style="color:#1f6fc4">Azul</b> = pontos por engajamento.</div><div class="cv"><canvas id="chScore"></canvas></div></div>
+      <div class="card chartcard"><h3>Quem mais trouxe seguidores</h3><div class="hint">Seguidores novos gerados por cada vídeo (8 primeiros).</div><div class="cv"><canvas id="chSeg"></canvas></div></div>
+      <div class="card chartcard"><h3>Quem mais gerou engajamento</h3><div class="hint">Curtidas (×1) + comentários (×2) + reposts, envios e salvamentos (×3) — 8 primeiros.</div><div class="cv"><canvas id="chEng"></canvas></div></div>
+      <div class="card chartcard"><h3>Como as pessoas interagiram</h3><div class="hint">Fatia de cada tipo de interação no total do mês.</div><div class="cv"><canvas id="chMix"></canvas></div></div>
+      <div class="card chartcard span2"><h3>Qual formato rende mais</h3><div class="hint">Nota média dos vídeos de cada tipo. Entre parênteses, quantos vídeos do mês são daquele formato.</div><div class="cv short"><canvas id="chCat"></canvas></div></div>
     </div>
 
     <div class="sec"><h2>📋 Ranking completo</h2><span class="sub">Clique em uma linha para ver o detalhe da nota</span></div>
@@ -623,34 +684,71 @@ function renderView(){
   document.getElementById("csv").onclick = ()=>exportCSV(m,data);
 }
 
-/* ---------- pódio com player ---------- */
+/* ---------- estatísticas do mês (usadas pelo pódio e pelos insights) ---------- */
+function monthStats(data){
+  const epv = o => o.views>0 ? o.engRaw/o.views : 0;
+  const f1k = o => o.views>0 ? o.folAbs*1000/o.views : 0;
+  const rankBy = fn => { const m = new Map(); [...data].sort((a,b)=>fn(b)-fn(a)).forEach((o,i)=>m.set(o,i+1)); return m; };
+  return {
+    epv, f1k,
+    medEng: median(data.map(o=>o.engRaw)), medEpv: median(data.map(epv)), medF1k: median(data.map(f1k)),
+    totF: data.reduce((a,o)=>a+o.folAbs,0),
+    rSeg: rankBy(o=>o.folAbs), rEng: rankBy(o=>o.engRaw)
+  };
+}
+const ord = n => n+"º";
+
+/* texto de análise de cada vídeo do Top 3 */
+function topInsights(o,st){
+  const L = [];
+  if(o.folAbs>0) L.push(["👥",`Trouxe <b>${fmt(o.folAbs)} seguidores</b> — ${fN(o.folAbs/Math.max(1,st.totF)*100,0)}% de todos os seguidores do mês (${ord(st.rSeg.get(o))} em seguidores).`]);
+  else L.push(["👥","Não gerou seguidores diretos neste mês."]);
+  const x = st.medEng ? o.engRaw/st.medEng : 0;
+  L.push(["🔥",`Engajamento de <b>${fmt(o.engRaw)} pontos</b>${x?`, ${fN(x,1)}× a mediana do mês`:""} (${ord(st.rEng.get(o))} em engajamento).`]);
+  const intent = o.engRaw>0 ? (o.engRaw-o.like)/o.engRaw*100 : 0;
+  const leitura = intent>=65 ? "o público guarda e repassa este conteúdo" : intent>=45 ? "mistura de curtidas com ações de interesse" : "predomínio de curtidas";
+  L.push(["🔖",`<b>${fN(intent,0)}%</b> do engajamento veio de comentários, envios, reposts e salvamentos — ${leitura}. Foram <b>${fmt(o.envio)} envios</b> e <b>${fmt(o.salvamento)} salvamentos</b>.`]);
+  if(o.views>0){
+    const f = st.f1k(o), r = st.epv(o);
+    const verdict = (f>0 && f>st.medF1k*2) ? "Converte audiência em seguidor muito acima da média."
+      : (st.medEpv>0 && r<st.medEpv*0.5) ? "A reação é baixa para o alcance — provável efeito de tráfego pago."
+      : "O alcance veio acompanhado de boa reação.";
+    L.push(["👀",`Alcance de <b>${fmt(o.views)} views</b> e <b>${fN(f,2)} seguidores a cada 1.000 views</b> (mediana do mês: ${fN(st.medF1k,2)}). ${verdict}`]);
+  }
+  return L;
+}
+
+/* ---------- pódio com player + análise em texto ---------- */
 function renderPodium(){
-  const {key,data} = curView, top = data.slice(0,3);
+  const {key,data} = curView, top = data.slice(0,3), st = monthStats(data);
   const tags = ["Ouro","Prata","Bronze"];
   document.getElementById("podium").innerHTML = top.map((o,i)=>{
-    const url = getLink(key,o.p.video), emb = url ? embedFor(url) : null;
+    const url = getLink(key,o.p.video,o.p), emb = url ? embedFor(url) : null;
     let media;
     if(emb && (emb.kind==="ig" || emb.kind==="tt")) media = `<div class="vbox tall"><iframe src="${emb.src}" loading="lazy" allowfullscreen scrolling="no"></iframe></div>`;
     else if(emb && emb.kind==="yt") media = `<div class="vbox wide"><iframe src="${emb.src}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
     else if(emb && emb.kind==="file") media = `<div class="vbox wide"><video src="${esc(emb.src)}" controls playsinline preload="metadata"></video></div>`;
     else if(emb) media = `<div class="vph"><div class="play">🔗</div><a href="${esc(emb.src)}" target="_blank" rel="noopener">Abrir vídeo em nova aba</a></div>`;
     else media = `<div class="vph"><div class="play">▶</div><div class="vtxt">Ainda sem link do vídeo</div>
-        <form class="lnk" data-i="${i}"><input type="url" name="url" required placeholder="Cole o link do Reel/Post (Instagram, YouTube, TikTok)" /><button class="btn primary">Salvar</button></form></div>`;
-    const acts = url ? `<div class="vact"><button data-act="edit" data-i="${i}">✎ Trocar link</button><button data-act="rm" data-i="${i}">Remover</button></div>` : "";
+        <form class="lnk" data-i="${i}"><input type="url" name="url" required placeholder="Cole o link do Reel/Post" /><button class="btn primary">Salvar</button></form></div>`;
+    const acts = url ? `<div class="vact"><a href="${esc(url)}" target="_blank" rel="noopener">Abrir original ↗</a><button data-act="edit" data-i="${i}">✎ Trocar link</button><button data-act="rm" data-i="${i}">Remover</button></div>` : "";
+    const bullets = topInsights(o,st).map(([ic,t])=>`<li><span class="bi">${ic}</span><span>${t}</span></li>`).join("");
     return `
-    <div class="card pod2 p${i+1}">
-      <div class="phead"><span class="medal2">${i+1}º</span><span class="ptag">${tags[i]}</span></div>
-      <div class="pname">${esc(o.p.video)}</div>
-      <div class="pscore">${f1(o.score)}<span> / 100</span></div>
-      <div class="mini">${bar(o)}</div>
-      <div class="chips">
-        <span class="chip"><b>${fmt(o.folAbs)}</b> seguidores</span>
-        <span class="chip"><b>${fmt(o.engRaw)}</b> engaj.</span>
-        <span class="chip"><b>${fmt(o.envio)}</b> envios</span>
-        <span class="chip"><b>${fmt(o.salvamento)}</b> salvos</span>
-        <span class="chip mute"><b>${fmt(o.views)}</b> views</span>
+    <div class="card podrow p${i+1}">
+      <div class="pmedia">${media}${acts}</div>
+      <div class="pinfo">
+        <div class="phead"><span class="medal2">${i+1}º</span><span class="ptag">${tags[i]}</span><span class="pfmt">${esc(category(o.p.video))}</span></div>
+        <div class="pname">${esc(o.p.video)}</div>
+        <div class="pscorerow"><div class="pscore">${f1(o.score)}<span> / 100</span></div><div class="mini">${bar(o)}</div></div>
+        <div class="tiles">
+          <div class="tile"><b>${fmt(o.folAbs)}</b><span>Seguidores</span></div>
+          <div class="tile"><b>${fmt(o.engRaw)}</b><span>Engajamento</span></div>
+          <div class="tile"><b>${fmt(o.envio)}</b><span>Envios</span></div>
+          <div class="tile"><b>${fmt(o.salvamento)}</b><span>Salvamentos</span></div>
+        </div>
+        <div class="whyt">Por que está no pódio</div>
+        <ul class="why">${bullets}</ul>
       </div>
-      ${media}${acts}
     </div>`;
   }).join("");
   document.querySelectorAll("#podium form.lnk").forEach(f=>f.onsubmit = e=>{
@@ -660,139 +758,125 @@ function renderPodium(){
   document.querySelectorAll("#podium .vact button").forEach(b=>b.onclick = ()=>{
     const i = +b.dataset.i, v = top[i].p.video;
     if(b.dataset.act==="rm"){ setLink(key,v,""); renderPodium(); return; }
-    const nu = prompt("Cole o novo link do vídeo:", getLink(key,v));
+    const nu = prompt("Cole o novo link do vídeo:", getLink(key,v,top[i].p));
     if(nu!==null){ setLink(key,v,nu.trim()); renderPodium(); }
   });
 }
 
-/* ---------- insights ---------- */
+/* ---------- destaques do mês, organizados em 3 grupos ---------- */
 function renderInsights(){
-  const {m,data,prev} = curView;
-  const epv = o => o.views>0 ? o.engRaw/o.views : 0;
-  const f1k = o => o.views>0 ? o.folAbs*1000/o.views : 0;
+  const {data} = curView, st = monthStats(data);
   const best = (fn,filter=()=>true) => data.filter(filter).sort((a,b)=>fn(b)-fn(a))[0];
-  const medEng = median(data.map(o=>o.engRaw)), medEpv = median(data.map(epv)), medF1k = median(data.map(f1k));
   const bd = (t,k="info") => `<span class="badge ${k}">${t}</span>`;
-  const rk = o => bd(`#${o.rank} no ranking`, o.rank<=3?"gold":"info");
-  const cards = [];
+  const rk = o => bd(`${ord(o.rank)} no ranking`, o.rank<=3?"gold":"info");
+  const G = [
+    {t:"Resultado",ic:"🎯",c:"#c9a24b",rows:[]},
+    {t:"Engajamento",ic:"🔥",c:"#1f6fc4",rows:[]},
+    {t:"Alcance e formato",ic:"📡",c:"#12a89f",rows:[]}
+  ];
+  const add = (g,ic,lbl,name,val,b) => G[g].rows.push({ic,lbl,name,val,b});
 
   const s = best(o=>o.folAbs);
-  if(s && s.folAbs>0){
-    const totF = data.reduce((a,x)=>a+x.folAbs,0);
-    cards.push({ic:"👥",c:"#c9a24b",lbl:"Maior geração de seguidores",o:s,val:`${fmt(s.folAbs)} seguidores`,b:rk(s)+bd(`${fN(s.folAbs/Math.max(1,totF)*100,0)}% do mês`,"ok")});
-  }
-  const e = best(o=>o.engRaw);
-  cards.push({ic:"🔥",c:"#1f6fc4",lbl:"Maior engajamento",o:e,val:`${fmt(e.engRaw)} pts`,b:rk(e)+(medEng?bd(`${fN(e.engRaw/medEng,1)}× a mediana`,"ok"):"")});
-  const sh = best(o=>o.envio+o.repost);
-  cards.push({ic:"📤",c:"#12a89f",lbl:"Mais compartilhado",o:sh,val:`${fmt(sh.envio)} envios · ${fmt(sh.repost)} reposts`,b:rk(sh)});
-  const sv = best(o=>o.salvamento);
-  cards.push({ic:"🔖",c:"#6366e8",lbl:"Mais salvo",o:sv,val:`${fmt(sv.salvamento)} salvamentos`,b:rk(sv)+bd("conteúdo de consulta","info")});
-  const cv = best(f1k,o=>o.views>=1000&&o.folAbs>0);
-  if(cv) cards.push({ic:"🎯",c:"#a97f28",lbl:"Melhor conversão em seguidores",o:cv,val:`${fN(f1k(cv),2)} por 1.000 views`,b:rk(cv)+bd(`mediana ${fN(medF1k,2)}`,"info")});
-  const ef = best(epv,o=>o.views>=1000);
-  if(ef) cards.push({ic:"⚡",c:"#4f9ae0",lbl:"Maior reação por visualização",o:ef,val:`${fN(epv(ef)*100,1)} pts a cada 100 views`,b:rk(ef)+bd(`mediana ${fN(medEpv*100,1)}`,"info")});
-  const rc = best(o=>o.views);
-  const lowReact = medEpv>0 && epv(rc) < medEpv*0.5;
-  cards.push({ic:"👀",c:"#9aa7b4",lbl:"Maior alcance",o:rc,val:`${fmt(rc.views)} views`,b:rk(rc)+(lowReact?bd("reação baixa — alcance provavelmente pago","warn"):bd("alcance com boa reação","ok"))});
+  if(s && s.folAbs>0) add(0,"👥","Mais seguidores",s.p.video,`${fmt(s.folAbs)} seguidores`,rk(s)+bd(`${fN(s.folAbs/Math.max(1,st.totF)*100,0)}% do mês`,"ok"));
+  const cv = best(st.f1k,o=>o.views>=1000&&o.folAbs>0);
+  if(cv) add(0,"🎯","Melhor conversão em seguidores",cv.p.video,`${fN(st.f1k(cv),2)} a cada 1.000 views`,rk(cv)+bd(`mediana ${fN(st.medF1k,2)}`));
 
+  const e = best(o=>o.engRaw);
+  add(1,"🔥","Maior engajamento",e.p.video,`${fmt(e.engRaw)} pontos`,rk(e)+(st.medEng?bd(`${fN(e.engRaw/st.medEng,1)}× a mediana`,"ok"):""));
+  const sh = best(o=>o.envio+o.repost);
+  add(1,"📤","Mais compartilhado",sh.p.video,`${fmt(sh.envio)} envios · ${fmt(sh.repost)} reposts`,rk(sh));
+  const sv = best(o=>o.salvamento);
+  add(1,"🔖","Mais salvo",sv.p.video,`${fmt(sv.salvamento)} salvamentos`,rk(sv));
+  const ef = best(st.epv,o=>o.views>=1000);
+  if(ef) add(1,"⚡","Maior reação por visualização",ef.p.video,`${fN(st.epv(ef)*100,1)} pontos a cada 100 views`,rk(ef)+bd(`mediana ${fN(st.medEpv*100,1)}`));
+
+  const rc = best(o=>o.views);
+  const low = st.medEpv>0 && st.epv(rc) < st.medEpv*0.5;
+  add(2,"👀","Maior alcance",rc.p.video,`${fmt(rc.views)} views`,rk(rc)+(low?bd("reação baixa para o alcance","warn"):bd("boa reação","ok")));
   const cat = {};
   data.forEach(o=>{ const c = category(o.p.video); (cat[c] = cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum += o.score; });
   const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n}));
-  const cand = cl.filter(x=>x.n>=2); const champ = (cand.length?cand:cl).sort((a,b)=>b.avg-a.avg)[0];
-  if(champ) cards.push({ic:"🎬",c:"#c9a24b",lbl:"Formato campeão",t:champ.c,val:`nota média ${f1(champ.avg)}`,b:bd(`${champ.n} ${champ.n>1?"posts":"post"}`,"info")+bd(`${cl.length} ${cl.length>1?"formatos":"formato"}`,"info")});
+  const cand = cl.filter(x=>x.n>=2), champ = (cand.length?cand:cl).sort((a,b)=>b.avg-a.avg)[0];
+  if(champ) add(2,"🎬","Formato que mais rende",champ.c,`nota média ${f1(champ.avg)}`,bd(`${champ.n} ${champ.n>1?"vídeos":"vídeo"}`)+bd(`${cl.length} formatos no mês`));
 
-  if(prev){
-    const sum = (ps,k)=>ps.reduce((a,p)=>a+(p[k]||0),0);
-    const pf = sum(prev.posts,"seguidores"), cf = sum(m.posts,"seguidores");
-    const d = pf>0 ? (cf-pf)/pf*100 : null;
-    const good = d===null || d>=0;
-    cards.push({ic:good?"📈":"📉",c:good?"#17794a":"#a52a2a",lbl:`Evolução vs ${prev.label.split(" ")[0]}`,t:"Seguidores gerados no mês",val:d===null?`${fmt(cf)} seguidores`:`${d>=0?"+":""}${fN(d,1)}%`,b:bd(`${fmt(pf)} → ${fmt(cf)}`,good?"ok":"bad")});
-  }
-
-  document.getElementById("insights").innerHTML = cards.map(c=>`
-    <div class="card ins" style="--c:${c.c}">
-      <div class="ic">${c.ic}</div>
-      <div class="ib">
-        <div class="lbl">${c.lbl}</div>
-        <div class="ttl">${c.t ? esc(c.t) : esc(c.o.p.video)}</div>
-        <div class="val">${c.val}</div>
-        <div class="bds">${c.b||""}</div>
-      </div>
+  document.getElementById("insights").innerHTML = G.filter(g=>g.rows.length).map(g=>`
+    <div class="card igroup" style="--c:${g.c}">
+      <div class="igh"><span>${g.ic}</span>${g.t}</div>
+      ${g.rows.map(r=>`
+      <div class="irow">
+        <div class="ic">${r.ic}</div>
+        <div class="ib">
+          <div class="lbl">${r.lbl}</div>
+          <div class="ttl">${esc(r.name)}</div>
+          <div class="val">${r.val}</div>
+          <div class="bds">${r.b||""}</div>
+        </div>
+      </div>`).join("")}
     </div>`).join("");
 }
 
 /* ---------- gráficos (Chart.js) ---------- */
+const valueLabels = {
+  id:"valueLabels",
+  afterDatasetsDraw(chart,args,opts){
+    const {ctx} = chart; ctx.save();
+    ctx.font = "700 11px Inter, sans-serif"; ctx.fillStyle = "#1a2230"; ctx.textBaseline = "middle";
+    chart.data.datasets.forEach((ds,di)=>{
+      if(opts.only!=null && opts.only!==di) return;
+      chart.getDatasetMeta(di).data.forEach((el,i)=>{ ctx.fillText(opts.fmt ? opts.fmt(ds.data[i],i) : ds.data[i], el.x+7, el.y); });
+    });
+    ctx.restore();
+  }
+};
 function buildCharts(){
   if(!window.Chart){ document.querySelectorAll(".cv").forEach(el=>el.innerHTML='<div class="evo-note">Gráficos indisponíveis (sem conexão com a biblioteca).</div>'); return; }
-  const {data,keys} = curView;
+  const {data} = curView;
   Chart.defaults.font.family = "Inter, system-ui, sans-serif";
-  Chart.defaults.color = "#69768c";
+  Chart.defaults.color = "#4a566b";
   const gold = "#c9a24b", goldD = "#a97f28", blue = "#1f6fc4", blueS = "#4f9ae0", teal = "#12a89f", violet = "#6366e8";
   const add = c => charts.push(c);
-
-  // 1) Top 10 — pontuação empilhada
-  const t10 = data.slice(0,10);
-  add(new Chart(document.getElementById("chScore"),{
+  const hbar = (id,labels,ds,extra={}) => new Chart(document.getElementById(id),{
     type:"bar",
-    data:{labels:t10.map(o=>shortName(o.p.video,28)),datasets:[
-      {label:"Seguidores",data:t10.map(o=>+o.s1.toFixed(1)),backgroundColor:goldD,borderRadius:4},
-      {label:"Engajamento",data:t10.map(o=>+o.s3.toFixed(1)),backgroundColor:blue,borderRadius:4}]},
-    options:{indexAxis:"y",maintainAspectRatio:false,scales:{x:{stacked:true,max:100,grid:{color:"#eef1f6"}},y:{stacked:true,grid:{display:false},ticks:{autoSkip:false}}},
-      plugins:{legend:{position:"bottom"},tooltip:{callbacks:{title:i=>t10[i[0].dataIndex].p.video,label:c=>`${c.dataset.label}: ${f1(c.raw)} pts`,footer:i=>`Total: ${f1(t10[i[0].dataIndex].score)} / 100`}}}}
-  }));
+    data:{labels,datasets:ds},
+    plugins:[valueLabels],
+    options:Object.assign({indexAxis:"y",maintainAspectRatio:false,layout:{padding:{right:54}},
+      scales:{x:{grid:{color:"#eef1f6"},beginAtZero:true,grace:"4%"},y:{grid:{display:false},ticks:{autoSkip:false}}}},extra)
+  });
 
-  // 2) Bolhas — seguidores x engajamento (tamanho = views)
-  const maxV = Math.max(...data.map(o=>o.views),1);
-  const pts = data.map(o=>({x:Math.max(1,o.engRaw),y:o.folAbs+1,r:4+18*Math.sqrt(o.views/maxV),o}));
-  pts.forEach(p=>p.y=Math.log(p.o.folAbs+1));
-  const maxSeg = Math.max(...data.map(o=>o.folAbs));
-  add(new Chart(document.getElementById("chBubble"),{
-    type:"bubble",
-    data:{datasets:[{label:"Vídeos",data:pts,backgroundColor:pts.map(p=>p.o.rank<=3?"rgba(201,162,75,.85)":"rgba(31,111,196,.45)"),borderColor:pts.map(p=>p.o.rank<=3?goldD:blue),borderWidth:1}]},
-    options:{maintainAspectRatio:false,
-      scales:{x:{type:"logarithmic",title:{display:true,text:"Engajamento (ponderado)"},grid:{color:"#eef1f6"},ticks:{maxRotation:0,callback:v=>{ const l=Math.round(v/Math.pow(10,Math.floor(Math.log10(v)))); return [1,2,5].includes(l)?fmt(v):""; }}},
-              y:{type:"linear",title:{display:true,text:"Seguidores"},grid:{color:"#eef1f6"},min:0,
-                 afterBuildTicks:ax=>{ ax.ticks = [0,1,3,10,30,100,300,1000,2000].filter(v=>v<=Math.max(maxSeg,1)*1.5).map(v=>({value:Math.log(1+v)})); },
-                 ticks:{callback:v=>fmt(Math.round(Math.exp(v)-1))}}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>i[0].raw.o.p.video,label:c=>{const o=c.raw.o;return [`#${o.rank} no ranking · nota ${f1(o.score)}`,`Seguidores: ${fmt(o.folAbs)}`,`Engajamento: ${fmt(o.engRaw)}`,`Views: ${fmt(o.views)}`];}}}}}
-  }));
+  // 1) Nota final — de onde vêm os pontos
+  const t10 = data.slice(0,10);
+  add(hbar("chScore",t10.map(o=>shortName(o.p.video,30)),[
+      {label:"Pontos de seguidores",data:t10.map(o=>+o.s1.toFixed(1)),backgroundColor:goldD,borderRadius:4},
+      {label:"Pontos de engajamento",data:t10.map(o=>+o.s3.toFixed(1)),backgroundColor:blue,borderRadius:4}],
+    {scales:{x:{stacked:true,max:100,grid:{color:"#eef1f6"},title:{display:true,text:"nota (0 a 100)"}},y:{stacked:true,grid:{display:false},ticks:{autoSkip:false}}},
+     plugins:{legend:{position:"bottom"},valueLabels:{only:1,fmt:(v,i)=>f1(t10[i].score)},tooltip:{callbacks:{title:i=>t10[i[0].dataIndex].p.video,label:c=>`${c.dataset.label}: ${f1(c.raw)}`,footer:i=>`Nota final: ${f1(t10[i[0].dataIndex].score)}`}}}}));
 
-  // 3) Composição das interações
+  // 2) Quem mais trouxe seguidores
+  const sTop = [...data].filter(o=>o.folAbs>0).sort((a,b)=>b.folAbs-a.folAbs).slice(0,8);
+  if(sTop.length) add(hbar("chSeg",sTop.map(o=>shortName(o.p.video,30)),[{label:"Seguidores",data:sTop.map(o=>o.folAbs),backgroundColor:gold,borderRadius:5}],
+    {plugins:{legend:{display:false},valueLabels:{fmt:v=>fmt(v)},tooltip:{callbacks:{title:i=>sTop[i[0].dataIndex].p.video,label:c=>`${fmt(c.raw)} seguidores`}}}}));
+  else document.getElementById("chSeg").parentElement.innerHTML = '<div class="evo-note">Nenhum vídeo gerou seguidores neste mês.</div>';
+
+  // 3) Quem mais gerou engajamento
+  const eTop = [...data].sort((a,b)=>b.engRaw-a.engRaw).slice(0,8);
+  add(hbar("chEng",eTop.map(o=>shortName(o.p.video,30)),[{label:"Engajamento",data:eTop.map(o=>o.engRaw),backgroundColor:blue,borderRadius:5}],
+    {plugins:{legend:{display:false},valueLabels:{fmt:v=>fmt(v)},tooltip:{callbacks:{title:i=>eTop[i[0].dataIndex].p.video,label:c=>`${fmt(c.raw)} pontos de engajamento`}}}}));
+
+  // 4) Como as pessoas interagiram
   const sumK = k => data.reduce((a,o)=>a+o[k],0);
   const mix = [["Curtidas",sumK("like"),blue],["Comentários",sumK("comentario"),teal],["Reposts",sumK("repost"),violet],["Envios",sumK("envio"),gold],["Salvamentos",sumK("salvamento"),goldD]];
   const mixTot = mix.reduce((a,x)=>a+x[1],0)||1;
   add(new Chart(document.getElementById("chMix"),{
     type:"doughnut",
-    data:{labels:mix.map(x=>x[0]),datasets:[{data:mix.map(x=>x[1]),backgroundColor:mix.map(x=>x[2]),borderWidth:2,borderColor:"#fff"}]},
-    options:{maintainAspectRatio:false,cutout:"62%",plugins:{legend:{position:"right"},tooltip:{callbacks:{label:c=>`${c.label}: ${fmt(c.raw)} (${fN(c.raw/mixTot*100,1)}%)`}}}}
+    data:{labels:mix.map(x=>`${x[0]} — ${fN(x[1]/mixTot*100,0)}%`),datasets:[{data:mix.map(x=>x[1]),backgroundColor:mix.map(x=>x[2]),borderWidth:2,borderColor:"#fff"}]},
+    options:{maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"right",labels:{boxWidth:14,padding:12}},tooltip:{callbacks:{label:c=>`${fmt(c.raw)} interações`}}}}
   }));
 
-  // 4) Nota média por formato
+  // 5) Qual formato rende mais
   const cat = {}; data.forEach(o=>{ const c=category(o.p.video); (cat[c]=cat[c]||{n:0,sum:0}); cat[c].n++; cat[c].sum+=o.score; });
   const cl = Object.entries(cat).map(([c,v])=>({c,n:v.n,avg:v.sum/v.n})).sort((a,b)=>b.avg-a.avg);
-  add(new Chart(document.getElementById("chCat"),{
-    type:"bar",
-    data:{labels:cl.map(x=>`${x.c} (${x.n})`),datasets:[{label:"Nota média",data:cl.map(x=>+x.avg.toFixed(1)),backgroundColor:cl.map((x,i)=>i===0?gold:blueS),borderRadius:6}]},
-    options:{indexAxis:"y",maintainAspectRatio:false,scales:{x:{grid:{color:"#eef1f6"}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Nota média: ${f1(c.raw)}`}}}}
-  }));
-
-  // 5) Evolução mês a mês
-  const asc = [...keys].reverse(), evo = document.getElementById("evoNote");
-  if(asc.length<2){
-    document.querySelector("#chEvo").parentElement.style.display = "none";
-    evo.textContent = "Carregue mais um mês para ver a evolução (seguidores e interações lado a lado).";
-  } else {
-    const ms = asc.map(k=>store.months[k]);
-    const S = ms.map(x=>x.posts.reduce((a,p)=>a+(p.seguidores||0),0));
-    const E = ms.map(x=>x.posts.reduce((a,p)=>a+p.like+p.comentario+p.repost+p.envio+p.salvamento,0));
-    add(new Chart(document.getElementById("chEvo"),{
-      type:"bar",
-      data:{labels:ms.map(x=>x.label),datasets:[
-        {label:"Seguidores",data:S,backgroundColor:gold,borderRadius:6,yAxisID:"y"},
-        {label:"Interações",data:E,backgroundColor:blue,borderRadius:6,yAxisID:"y1"}]},
-      options:{maintainAspectRatio:false,scales:{y:{position:"left",title:{display:true,text:"Seguidores"},grid:{color:"#eef1f6"},beginAtZero:true},y1:{position:"right",title:{display:true,text:"Interações"},grid:{display:false},beginAtZero:true}},plugins:{legend:{position:"bottom"}}}
-    }));
-  }
+  add(hbar("chCat",cl.map(x=>`${x.c} (${x.n} ${x.n>1?"vídeos":"vídeo"})`),[{label:"Nota média",data:cl.map(x=>+x.avg.toFixed(1)),backgroundColor:cl.map((x,i)=>i===0?gold:blueS),borderRadius:5}],
+    {plugins:{legend:{display:false},valueLabels:{fmt:v=>f1(v)},tooltip:{callbacks:{label:c=>`Nota média: ${f1(c.raw)}`}}}}));
 }
 
 /* ---------- tabela ---------- */
